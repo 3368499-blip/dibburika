@@ -1,0 +1,88 @@
+/* עיצוב משותף למסכי המשחקים */
+body { background: radial-gradient(1200px 600px at 100% -10%, #E9E7FF 0, transparent 60%), radial-gradient(900px 500px at -10% 110%, #FFE6DC 0, transparent 60%), var(--bg); min-height: 100vh; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 18px; }
+.bar { display: flex; align-items: center; justify-content: space-between; height: 66px; gap: 10px; }
+.bar .title { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--ink); }
+.bar .title .em { font-family: var(--emoji); font-size: 1.7rem; }
+
+/* ---------- הגדרות ---------- */
+.setup { padding: 8px 0 30px; }
+.setup h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; margin: 10px 0 4px; }
+.setup .sub { color: var(--muted); margin-bottom: 26px; }
+.panel { background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 22px; margin-bottom: 18px; }
+.panel h2 { font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+.panel h2 .n { width: 26px; height: 26px; border-radius: 9px; background: var(--brand-soft); color: var(--brand-ink); display: grid; place-items: center; font-size: .85rem; }
+.src-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 18px; }
+.src { border: 2px solid var(--line); background: #fff; border-radius: 18px; padding: 12px 14px; text-align: right; cursor: pointer; display: grid; gap: 2px; transition: .15s; }
+.src .em { font-family: var(--emoji); font-size: 1.6rem; }
+.src small { color: var(--muted); }
+.src.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 12%, transparent); }
+.sub-label { font-weight: 700; font-size: .9rem; color: var(--ink-2); margin: 14px 0 8px; }
+.cats { display: flex; flex-wrap: wrap; gap: 8px; }
+.cat { display: inline-flex; align-items: center; gap: 6px; border: 2px solid var(--line); background: #fff; border-radius: 99px; padding: 6px 14px; cursor: pointer; font-weight: 600; transition: .15s; min-height: 42px; }
+.cat .em { font-family: var(--emoji); font-size: 1.25rem; }
+.cat small { color: var(--muted); font-weight: 500; }
+.cat.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, #fff); }
+.cat.all { border-style: dashed; }
+.sounds { display: flex; flex-wrap: wrap; gap: 8px; }
+.snd { min-width: 64px; height: 64px; padding: 0 12px; border-radius: 18px; border: 2px solid var(--line); background: #fff; font-size: 1.6rem; font-weight: 800; cursor: pointer; transition: .15s; }
+.snd.on { border-color: var(--coral); background: var(--coral-soft); color: #C2410C; transform: translateY(-2px); }
+.list-row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-bottom: 10px; }
+.avail-line { margin-top: 16px; color: var(--muted); }
+.avail-line b { color: var(--ink); }
+.opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px 24px; align-items: start; }
+.opt-label { font-weight: 600; font-size: .9rem; color: var(--ink-2); margin-bottom: 8px; display: block; }
+.toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.start-row { position: sticky; bottom: 0; padding: 14px 0 18px; display: flex; gap: 12px; align-items: center; justify-content: flex-end; background: linear-gradient(to top, var(--bg) 70%, transparent); flex-wrap: wrap; }
+.ready { min-height: calc(100vh - 66px); display: grid; place-items: center; }
+.ready-card { background: #fff; border-radius: 34px; box-shadow: var(--shadow-lg); padding: 40px 30px; text-align: center; width: min(460px, 100%); display: grid; gap: 14px; justify-items: center; animation: pop .4s; }
+.ready-em { font-family: var(--emoji); font-size: 5rem; animation: float 3s ease-in-out infinite; }
+.ready-card h1 { margin: 0; font-size: 2rem; }
+.ready-card p { margin: 0; line-height: 1.8; }
+
+/* ---------- כרטיס מילה ---------- */
+.c-pic { line-height: 1; display: grid; place-items: center; }
+.c-pic .pic-img { width: 1.4em; height: 1.4em; border-radius: .12em; }
+.c-text { font-weight: 800; }
+.c-sub { color: var(--muted); font-weight: 700; }
+
+.word-pop { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: rgba(30, 33, 69, .45); backdrop-filter: blur(5px); animation: fadeIn .2s; padding: 16px; }
+.word-pop.out { opacity: 0; transition: opacity .25s; }
+.wp-card { position: relative; background: #fff; border-radius: 40px; box-shadow: var(--shadow-lg); padding: 30px 30px 24px; width: min(440px, 100%); text-align: center; animation: zoomIn .45s cubic-bezier(.2, 1.4, .4, 1); }
+.wp-card .c-pic { font-size: clamp(7rem, 30vw, 10rem); margin-bottom: 8px; }
+.wp-card .c-text { font-size: clamp(2.2rem, 8vw, 3rem); }
+.wp-card .c-sub { font-size: 1.6rem; color: var(--brand-ink); margin-top: 2px; }
+.wp-btns { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+.wp-say { font-family: var(--emoji); width: 58px; padding: 0; }
+.wp-burst { position: absolute; inset: 0; pointer-events: none; }
+.wp-burst i { position: absolute; top: 34%; left: 50%; font-style: normal; color: var(--sun); font-size: 1.6rem; transform: rotate(var(--a)) translateY(0); animation: burst .8s ease-out forwards; }
+@keyframes burst { to { transform: rotate(var(--a)) translateY(-170px); opacity: 0; } }
+@keyframes zoomIn { from { transform: scale(.3) rotate(-8deg); opacity: 0; } }
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes pop { from { transform: scale(.9); opacity: 0; } }
+@keyframes float { 50% { transform: translateY(-10px); } }
+
+/* ---------- משחק ---------- */
+.play { min-height: 100vh; display: flex; flex-direction: column; }
+.progress { flex: 1; height: 14px; border-radius: 99px; background: #fff; box-shadow: inset 0 1px 3px rgba(0,0,0,.08); overflow: hidden; max-width: 520px; }
+.progress i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--mint), #4ADE80); transition: width .4s ease; }
+.score { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; background: #fff; padding: 6px 14px; border-radius: 99px; box-shadow: var(--shadow); }
+.score .em { font-family: var(--emoji); }
+
+/* ---------- סיום ---------- */
+.end { min-height: 100vh; display: grid; place-items: center; padding: 20px 0; }
+.endcard { background: #fff; border-radius: 34px; box-shadow: var(--shadow-lg); padding: 34px 26px; text-align: center; width: min(600px, 100%); animation: pop .4s; }
+.endcard .trophy { font-family: var(--emoji); font-size: 5rem; }
+.stars { font-family: var(--emoji); font-size: 2.6rem; letter-spacing: 6px; margin: 4px 0 8px; }
+.stars .off { filter: grayscale(1); opacity: .3; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin: 20px 0; }
+.kpi { background: var(--bg-2); border-radius: 18px; padding: 12px 6px; }
+.kpi b { display: block; font-size: 1.6rem; font-weight: 800; }
+.kpi span { color: var(--muted); font-size: .85rem; }
+.seen { text-align: right; background: var(--bg-2); border-radius: 18px; padding: 14px 16px; margin-bottom: 18px; }
+.seen h3 { font-size: 1rem; margin-bottom: 8px; }
+.seen .list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 200px; overflow: auto; }
+.seen-w { background: #fff; border: 0; padding: 4px 12px; border-radius: 99px; font-weight: 600; font-size: .9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.seen-w .pic-emoji, .seen-w .pic-multi, .seen-w .pic-letter { font-size: 1.2rem; }
+.seen-w .pic-img { width: 22px; height: 22px; }
+.endbtns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }

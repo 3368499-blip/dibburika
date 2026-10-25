@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>זיכרון משפטים · דיבוריקה</title>
+<meta name="theme-color" content="#5B5BD6">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🃏</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/game.css">
+<style>
+  .arena { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 0 24px; gap: 14px; }
+  .memgrid { display: grid; gap: clamp(8px, 1.4vw, 14px); width: 100%; perspective: 1000px; }
+  .mcard { aspect-ratio: 4/5; border: 0; padding: 0; background: transparent; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform .45s; border-radius: 20px; animation: deal .4s backwards; }
+  @keyframes deal { from { transform: translateY(30px) scale(.8); opacity: 0; } }
+  .mcard.flip, .mcard.done { transform: rotateY(180deg); }
+  .mcard .face { position: absolute; inset: 0; border-radius: 20px; backface-visibility: hidden; -webkit-backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4%; box-shadow: var(--shadow); padding: 8px; overflow: hidden; }
+  .mcard .back { background: linear-gradient(140deg, var(--brand), #8B5CF6); }
+  .mcard .back::before { content: ''; position: absolute; inset: 7px; border-radius: 14px; border: 2px dashed rgba(255,255,255,.35); }
+  .mcard .back span { font-family: var(--emoji); font-size: calc(var(--cw) * .32); }
+  .mcard .front { background: #fff; transform: rotateY(180deg); }
+  .mcard .front .c-pic { font-size: calc(var(--cw) * .4); }
+  .mcard .front .c-pic .pic-img { width: calc(var(--cw) * .6); height: calc(var(--cw) * .5); }
+  .mcard .front .c-text { font-size: clamp(.8rem, calc(var(--cw) * .13), 1.35rem); text-align: center; line-height: 1.25; }
+  .mcard .front.only-text .c-text { font-size: clamp(1rem, calc(var(--cw) * .17), 1.8rem); color: var(--brand-ink); }
+  .mcard .front .c-sub { font-size: clamp(.75rem, calc(var(--cw) * .11), 1.1rem); }
+  .mcard.done .front { box-shadow: 0 0 0 4px var(--mint), var(--shadow); }
+  .mcard.done { animation: matched .6s; }
+  @keyframes matched { 50% { transform: rotateY(180deg) scale(1.08); } }
+  .mcard.nope .front { box-shadow: 0 0 0 4px var(--coral), var(--shadow); }
+  .turns { display: flex; gap: 10px; }
+  .turn { background: #fff; border-radius: 99px; padding: 6px 16px; font-weight: 700; box-shadow: var(--shadow); border: 3px solid transparent; }
+  .turn.on { border-color: var(--brand); }
+  .turn .em { font-family: var(--emoji); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="../data/words.js"></script>
+<script src="../data/uses.js"></script>
+<script src="../data/sentences.js"></script>
+<script src="../data/games.js"></script>
+<script src="../assets/core.js"></script>
+<script src="../assets/content.js"></script>
+<script>
+(async function () {
+  'use strict';
+  const GAME = 'memory';
+  const app = document.getElementById('app');
+  try { await DIB.gate(GAME); } catch (e) { return; }
+
+  const setup = DIBC.setupScreen(app, {
+    game: GAME, title: 'זיכרון משפטים', emoji: '🃏',
+    intro: 'הופכים שני קלפים ומחפשים זוג. כל קלף שנפתח מוקרא בקול.',
+    sources: ['sentences', 'uses', 'words'],
+    minItems: 3,
+    defaults: { src: 'sentences', slevels: [1, 2], level: 3, cats: [], pairs: 6, similar: false, wface: 'same', players: 1 },
+    options: cfg =>
+      DIBC.optSeg('מספר קלפים', 'pairs', [[3, '6'], [4, '8'], [6, '12'], [8, '16'], [10, '20'], [12, '24']], cfg.pairs) +
+      (cfg.src === 'sentences' ? DIBC.optToggle('משפטים דומים (ילד אוכל / ילדה אוכלת)', 'similar', cfg.similar) : '') +
+      (cfg.src === 'words' ? DIBC.optSeg('סוג הזוג', 'wface', [['same', 'שני קלפים זהים'], ['picword', 'תמונה ומילה']], cfg.wface) : '') +
+      (cfg.src === 'uses' ? '<p class="muted small" style="margin:0">הזוג הוא חפץ והשימוש שלו: קלף "מפתח" וקלף "פותחים".</p>' : '') +
+      DIBC.optSeg('שחקנים', 'players', [[1, 'שחקן אחד'], [2, 'שניים בתורות']], cfg.players),
+    onSourceChange: (cfg, redraw) => redraw(),
+    onStart: start
+  });
+
+  /** בוחר כרטיסים ובונה זוגות קלפים. */
+  function deal(cfg, all) {
+    let chosen = [];
+    if (cfg.src === 'sentences' && cfg.similar) {
+      const groups = {};
+      all.forEach(c => (groups[c.group] = groups[c.group] || []).push(c));
+      const keys = DIB.shuffle(Object.keys(groups).filter(k => groups[k].length >= 2));
+      for (const k of keys) {
+        if (chosen.length >= cfg.pairs) break;
+        const g = DIB.shuffle(groups[k]);
+        const a = g[0], b = g.find(x => x.text.split(' ')[0] !== a.text.split(' ')[0]) || g[1];
+        chosen.push(a); if (chosen.length < cfg.pairs) chosen.push(b);
+      }
+    } else {
+      const seenT = new Set();
+      chosen = DIB.shuffle(all).filter(c => { const k = c.pair || c.text; if (seenT.has(k)) return false; seenT.add(k); return true; }).slice(0, cfg.pairs);
+    }
+    const out = [];
+    chosen.forEach(c => {
+      if (cfg.src === 'uses') {
+        out.push({ c, face: 'pic' });
+        out.push({ c, face: 'use' });
+      } else if (cfg.src === 'words' && cfg.wface === 'picword') {
+        out.push({ c, face: 'pic' });
+        out.push({ c, face: 'text' });
+      } else {
+        out.push({ c, face: 'full' }); out.push({ c, face: 'full' });
+      }
+    });
+    return { chosen, deck: DIB.shuffle(out) };
+  }
+
+  function faceHTML(x) {
+    const c = x.c;
+    if (x.face === 'use') return '<div class="face front only-text"><div class="c-text">' + DIB.esc(c.sub) + '</div></div>';
+    if (x.face === 'text') return '<div class="face front only-text"><div class="c-text">' + DIB.esc(c.text) + '</div></div>';
+    if (x.face === 'pic' && cfgNow.src === 'uses') return '<div class="face front">' + DIBC.cardHTML(c, { noSub: true }) + '</div>';
+    if (x.face === 'pic') return '<div class="face front">' + DIBC.cardHTML(c, { noText: true }) + '</div>';
+    return '<div class="face front">' + DIBC.cardHTML(c) + '</div>';
+  }
+  function sayOf(x) { return x.face === 'use' ? x.c.sub : x.face === 'pic' && cfgNow.src === 'uses' ? x.c.text : x.c.speak || x.c.text; }
+
+  let cfgNow = null;
+  function start(cfg, all) {
+    cfgNow = cfg;
+    const { chosen, deck } = deal(cfg, all);
+    const pairs = chosen.length;
+    const total = deck.length;
+    const narrow = innerWidth < 640;
+    let cols = total <= 6 ? 3 : total <= 8 ? 4 : total <= 12 ? (narrow ? 3 : 4) : total <= 16 ? 4 : total <= 20 ? (narrow ? 4 : 5) : (narrow ? 4 : 6);
+    const rows = Math.ceil(total / cols);
+    const maxW = Math.min(innerWidth - 36, 980);
+    const byH = (innerHeight - 150) / rows * 0.8 * cols;
+    const gridW = Math.min(maxW, byH);
+    const cw = gridW / cols;
+    let moves = 0, found = 0, open = [], lock = false, player = 0;
+    const score = [0, 0];
+    const t0 = Date.now();
+    const two = cfg.players === 2;
+
+    app.innerHTML = '<div class="wrap play"><div class="bar"><button class="btn btn-outline btn-icon" id="quit" aria-label="יציאה">✕</button>' +
+      '<div class="progress"><i id="prog"></i></div><span class="score"><span class="em">👆</span><span id="mv">0</span></span></div>' +
+      '<div class="arena">' + (two ? '<div class="turns"><span class="turn on" id="p0"><span class="em">🔵</span> שחקן 1 · <b>0</b></span><span class="turn" id="p1"><span class="em">🟠</span> שחקן 2 · <b>0</b></span></div>' : '') +
+      '<div class="memgrid" style="grid-template-columns:repeat(' + cols + ',1fr);max-width:' + gridW + 'px;--cw:' + cw + 'px">' +
+      deck.map((x, i) => '<button class="mcard" style="animation-delay:' + (i * 0.03) + 's" data-i="' + i + '" aria-label="קלף"><span class="face back"><span>💬</span></span>' + faceHTML(x) + '</button>').join('') +
+      '</div></div></div>';
+    app.querySelector('#quit').onclick = () => { if (!found || confirm('לצאת מהמשחק?')) finish(true); };
+
+    app.querySelectorAll('.mcard').forEach(el => el.onclick = () => {
+      if (lock || el.classList.contains('flip') || el.classList.contains('done')) return;
+      const x = deck[Number(el.dataset.i)];
+      el.classList.add('flip'); DIB.sfx.tap();
+      DIB.speak(sayOf(x));
+      open.push({ el, x });
+      if (open.length < 2) return;
+      moves++; app.querySelector('#mv').textContent = moves;
+      const [a, b] = open; open = [];
+      lock = true;
+      if (a.x.c.id === b.x.c.id) {
+        setTimeout(() => {
+          a.el.classList.add('done'); b.el.classList.add('done');
+          DIB.sfx.good();
+          DIB.speak(cfg.src === 'uses' ? a.x.c.text + '. ' + a.x.c.sub : a.x.c.speak || a.x.c.text);
+          found++; score[player]++;
+          if (two) app.querySelector('#p' + player + ' b').textContent = score[player];
+          app.querySelector('#prog').style.width = (found / pairs * 100) + '%';
+          lock = false;
+          if (found === pairs) setTimeout(() => finish(false), 1600);
+        }, 700);
+      } else {
+        setTimeout(() => { a.el.classList.add('nope'); b.el.classList.add('nope'); }, 600);
+        setTimeout(() => {
+          a.el.classList.remove('flip', 'nope'); b.el.classList.remove('flip', 'nope'); lock = false;
+          if (two) { player = 1 - player; app.querySelector('#p0').classList.toggle('on', player === 0); app.querySelector('#p1').classList.toggle('on', player === 1); }
+        }, 1700);
+      }
+    });
+
+    function finish(early) {
+      const secs = Math.round((Date.now() - t0) / 1000);
+      if (found) DIB.logSession({ game: GAME, label: 'זיכרון · ' + DIBC.describe(cfg), patient: cfg.patient || '', total: pairs, correct: found, cued: 0, moves, missed: [], words: chosen.map(c => c.text), secs, early: !!early });
+      if (early && !found) return setup.redraw();
+      const eff = moves ? pairs / moves : 0;
+      const stars = early ? 1 : eff >= 0.6 ? 3 : eff >= 0.35 ? 2 : 1;
+      const winner = two ? (score[0] === score[1] ? 'תיקו!' : 'שחקן ' + (score[0] > score[1] ? 1 : 2) + ' ניצח!') : null;
+      DIBC.endScreen(app, {
+        stars, title: winner || (early ? 'יופי של משחק!' : 'מצאתם את כל הזוגות!'), sub: DIBC.describe(cfg),
+        say: winner || 'כל הכבוד!',
+        kpis: (two ? [[score[0] + ' : ' + score[1], 'תוצאה']] : []).concat([[found + '/' + pairs, 'זוגות'], [moves, 'ניסיונות'], [secs >= 60 ? Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') : secs + '״', 'זמן']]),
+        words: chosen, wordsTitle: cfg.src === 'sentences' ? 'המשפטים במשחק (לוחצים לשמוע)' : 'הכרטיסים במשחק (לוחצים לשמוע)',
+        onAgain: () => start(cfg, all), onSettings: setup.redraw
+      });
+    }
+  }
+})();
+</script>
+</body>
+</html>

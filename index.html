@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>דיבוריקה · משחקי שפה ודיבור</title>
+<meta name="description" content="משחקי שפה ודיבור לקלינאיות תקשורת ולהורים: אוצר מילים, שיום, הבנה וקטגוריזציה.">
+<meta name="theme-color" content="#5B5BD6">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💬</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 20px; }
+  header.top { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+  header.top.scrolled { border-bottom-color: var(--line); }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; height: 70px; gap: 12px; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-weight: 800; font-size: 1.35rem; }
+  .logo-mark { width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; background: linear-gradient(135deg, var(--brand), #8B5CF6); color: #fff; font-size: 20px; box-shadow: 0 6px 14px -6px var(--brand); }
+  .logo-mark span { font-family: var(--emoji); }
+  .top nav { display: flex; align-items: center; gap: 4px; }
+  .top nav a.link { padding: .5em .9em; border-radius: 99px; text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  .top nav a.link:hover { background: var(--brand-soft); color: var(--brand-ink); }
+  .user-pill { display: inline-flex; align-items: center; gap: 8px; }
+  @media (max-width: 720px) { .top nav a.link { display: none; } }
+
+  .hero { position: relative; overflow: hidden; padding: 56px 0 72px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); padding: 6px 14px 6px 8px; border-radius: 99px; font-weight: 600; font-size: .9rem; color: var(--ink-2); box-shadow: var(--shadow); }
+  .eyebrow b { background: var(--mint-soft); color: #11795F; padding: 2px 10px; border-radius: 99px; font-weight: 700; }
+  .hero h1 { font-size: clamp(2.3rem, 5.2vw, 3.9rem); font-weight: 800; margin: 18px 0 16px; letter-spacing: -.02em; }
+  .hero h1 em { font-style: normal; background: linear-gradient(120deg, var(--brand), #A855F7 55%, var(--coral)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero .lead { font-size: 1.2rem; color: var(--ink-2); max-width: 34em; }
+  .hero .ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+  .stats { display: flex; gap: 28px; margin-top: 34px; flex-wrap: wrap; }
+  .stats div { display: grid; }
+  .stats b { font-size: 1.8rem; font-weight: 800; color: var(--ink); line-height: 1.1; }
+  .stats span { color: var(--muted); font-size: .9rem; }
+
+  .stage { position: relative; aspect-ratio: 1; max-width: 460px; margin-inline: auto; width: 100%; }
+  .blob { position: absolute; inset: 6%; border-radius: 42% 58% 55% 45% / 48% 42% 58% 52%; background: radial-gradient(circle at 30% 30%, #fff 0, transparent 40%), linear-gradient(140deg, #C7C6FF, #FFD3C5 70%, #FFE7A8); animation: morph 14s ease-in-out infinite; }
+  @keyframes morph { 50% { border-radius: 55% 45% 42% 58% / 58% 52% 48% 42%; transform: rotate(8deg); } }
+  .bubble { position: absolute; background: #fff; border-radius: 26px; box-shadow: var(--shadow-lg); display: grid; place-items: center; font-family: var(--emoji); animation: float 6s ease-in-out infinite; }
+  .bubble small { font-family: var(--font); font-size: .85rem; font-weight: 700; color: var(--ink-2); margin-top: -4px; }
+  .b1 { width: 38%; aspect-ratio: 1; top: 22%; right: 31%; font-size: 4.5rem; animation-delay: -1s; border-radius: 34px; }
+  .b2 { width: 22%; aspect-ratio: 1; top: 6%; right: 8%; font-size: 2.4rem; animation-delay: -2s; }
+  .b3 { width: 22%; aspect-ratio: 1; top: 10%; left: 6%; font-size: 2.4rem; animation-delay: -3s; }
+  .b4 { width: 22%; aspect-ratio: 1; bottom: 10%; right: 12%; font-size: 2.4rem; animation-delay: -4s; }
+  .b5 { width: 22%; aspect-ratio: 1; bottom: 6%; left: 14%; font-size: 2.4rem; animation-delay: -5s; }
+  .speech { position: absolute; top: 4%; left: 34%; background: var(--ink); color: #fff; padding: 8px 16px; border-radius: 18px 18px 18px 4px; font-weight: 700; box-shadow: var(--shadow-lg); animation: float 5s ease-in-out infinite; }
+  @keyframes float { 50% { transform: translateY(-10px); } }
+  @media (max-width: 860px) { .hero .wrap { grid-template-columns: 1fr; } .stage { max-width: 340px; order: -1; } .hero { padding-top: 24px; } }
+
+  section.block { padding: 64px 0; }
+  .sec-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
+  .sec-head h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); font-weight: 800; margin: 0; }
+  .sec-head p { margin: 6px 0 0; color: var(--muted); }
+  .sec-head .seg { background: #fff; box-shadow: var(--shadow); }
+  .sec-head .seg button.on { background: var(--brand); color: #fff; }
+
+  .audience { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .aud { border-radius: 28px; padding: 30px; position: relative; overflow: hidden; }
+  .aud.slp { background: linear-gradient(150deg, #EEF0FF, #E5E1FF); }
+  .aud.parents { background: linear-gradient(150deg, #FFF1EA, #FFE4D8); }
+  .aud .ico { font-family: var(--emoji); font-size: 2.4rem; width: 64px; height: 64px; border-radius: 20px; background: #fff; display: grid; place-items: center; box-shadow: var(--shadow); margin-bottom: 16px; }
+  .aud h3 { font-size: 1.45rem; }
+  .aud ul { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .aud li { display: flex; gap: 10px; align-items: start; color: var(--ink-2); }
+  .aud li::before { content: '✓'; flex: none; width: 22px; height: 22px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: .75rem; font-weight: 800; color: var(--mint); margin-top: 2px; }
+  @media (max-width: 760px) { .audience { grid-template-columns: 1fr; } }
+
+  .games { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; }
+  .game { background: var(--card); border-radius: 28px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: transform .2s, box-shadow .2s; }
+  .game:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  .game .art { height: 170px; display: grid; place-items: center; position: relative; overflow: hidden; }
+  .game .art .em { font-family: var(--emoji); font-size: 5rem; filter: drop-shadow(0 10px 14px rgba(0,0,0,.15)); transition: transform .3s; }
+  .game:hover .art .em { transform: scale(1.08) rotate(-4deg); }
+  .game .art .mini { position: absolute; font-family: var(--emoji); font-size: 1.8rem; opacity: .9; }
+  .game .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .game h3 { font-size: 1.3rem; margin: 0; }
+  .game p { margin: 0; color: var(--muted); font-size: .95rem; }
+  .game .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .game .go { margin-top: auto; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: var(--brand-ink); }
+  .game.soon { border: 2px dashed var(--line); background: transparent; box-shadow: none; align-items: center; justify-content: center; text-align: center; padding: 30px; min-height: 280px; }
+  .game.soon:hover { transform: none; box-shadow: none; }
+  .game.soon .em { font-family: var(--emoji); font-size: 3rem; opacity: .7; }
+
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: s; }
+  .step { background: var(--card); border-radius: 24px; padding: 26px; box-shadow: var(--shadow); position: relative; }
+  .step::before { counter-increment: s; content: counter(s); width: 38px; height: 38px; border-radius: 12px; background: var(--brand); color: #fff; font-weight: 800; display: grid; place-items: center; margin-bottom: 14px; }
+  .step:nth-child(2)::before { background: var(--coral); }
+  .step:nth-child(3)::before { background: var(--mint); }
+  .step h3 { font-size: 1.15rem; }
+  .step p { color: var(--muted); margin: 0; }
+  @media (max-width: 760px) { .steps { grid-template-columns: 1fr; } }
+
+  footer { padding: 40px 0 50px; color: var(--muted); font-size: .9rem; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 26px; }
+</style>
+</head>
+<body>
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="logo" href="index.html"><span class="logo-mark"><span>💬</span></span><span id="siteName">דיבוריקה</span></a>
+    <nav>
+      <a class="link" href="#games">משחקים</a>
+      <a class="link" href="#how">איך זה עובד</a>
+      <span id="userArea"></span>
+      <a class="btn btn-outline btn-sm" href="dashboard.html">⚙️ דשבורד</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow"><b>חדש</b> משחקי שפה מקצועיים, בעברית</span>
+        <h1>משחקים שעוזרים <em>למילים לצאת החוצה</em></h1>
+        <p class="lead" id="tagline">משחקי שפה ודיבור לקלינאיות תקשורת ולהורים. בונים יחד אוצר מילים, הבנה ושיום, בטיפול ובבית.</p>
+        <div class="ctas">
+          <a class="btn btn-primary btn-lg" href="#games">🎮 למשחקים</a>
+          <a class="btn btn-outline btn-lg" href="#for">למי זה מתאים?</a>
+        </div>
+        <div class="stats">
+          <div><b id="statWords">–</b><span>מילים במאגר</span></div>
+          <div><b id="statCats">–</b><span>קטגוריות</span></div>
+          <div><b id="statSent">–</b><span>משפטים</span></div>
+          <div><b id="statGames">–</b><span>משחקים</span></div>
+        </div>
+      </div>
+      <div class="stage" aria-hidden="true">
+        <div class="blob"></div>
+        <div class="speech">איפה הפיל?</div>
+        <div class="bubble b1">🐘</div>
+        <div class="bubble b2">🍎</div>
+        <div class="bubble b3">🚗</div>
+        <div class="bubble b4">⚽</div>
+        <div class="bubble b5">🌈</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="for">
+    <div class="wrap">
+      <div class="sec-head"><div><h2>לטיפול ולבית</h2><p>אותם משחקים, מותאמים למי שמשתמש בהם.</p></div></div>
+      <div class="audience">
+        <div class="aud slp">
+          <div class="ico">🩺</div>
+          <h3>לקלינאיות תקשורת</h3>
+          <p class="muted">כלי עבודה לחדר הטיפול ולמשימות בית.</p>
+          <ul>
+            <li>בחירת קטגוריות, רמת קושי ומספר אפשרויות לכל מטופל</li>
+            <li>תיעוד אוטומטי של כל מפגש: אחוזי הצלחה ומילים שהיו קשות</li>
+            <li>מאגר מילים שאפשר להרחיב, כולל תמונות שלכם</li>
+            <li>שליחת קישור להורה עם המשחק וההגדרות שבחרתם</li>
+            <li>מתן גישה עם קוד אישי, רק למשחקים שבחרתם</li>
+          </ul>
+        </div>
+        <div class="aud parents">
+          <div class="ico">👨‍👩‍👧</div>
+          <h3>להורים</h3>
+          <p class="muted">תרגול קצר וכיף בבית, בלי הכנות.</p>
+          <ul>
+            <li>מסכים גדולים וברורים, מתאימים לטלפון ולטאבלט</li>
+            <li>הקראה של כל מילה בעברית ופידבק חיובי</li>
+            <li>מפגש של 5 דקות מספיק, והתוצאות נשמרות</li>
+            <li>בלי פרסומות ובלי הסחות דעת</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="games">
+    <div class="wrap">
+      <div class="sec-head"><div><h2>המשחקים</h2><p>בוחרים משחק ותוכן. כל הגדרה אפשר לשלוח להורה בקישור.</p></div><div class="seg" id="domains"></div></div>
+      <div class="games" id="gameGrid"></div>
+    </div>
+  </section>
+
+  <section class="block" id="how">
+    <div class="wrap">
+      <div class="sec-head"><div><h2>איך זה עובד</h2></div></div>
+      <div class="steps">
+        <div class="step"><h3>בוחרים משחק והגדרות</h3><p>קטגוריות, רמה, מספר תמונות במסך ומספר סבבים. ההגדרות נשמרות לפעם הבאה.</p></div>
+        <div class="step"><h3>משחקים ביחד</h3><p>המשחק מקריא את המילים, נותן פידבק ומשמח בכל הצלחה. אפשר לחזור על מילה בכל רגע.</p></div>
+        <div class="step"><h3>רואים התקדמות</h3><p>בסוף כל משחק יש סיכום, וכל המפגשים נשמרים בדשבורד לפי מטופל.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© <span id="year"></span> <span class="siteNameF">דיבוריקה</span> · נבנה באהבה לקלינאיות תקשורת ולהורים</span>
+    <a href="dashboard.html">כניסת מנהלים</a>
+  </div>
+</footer>
+
+<script src="data/words.js"></script>
+<script src="data/uses.js"></script>
+<script src="data/sentences.js"></script>
+<script src="data/artic.js"></script>
+<script src="data/games.js"></script>
+<script src="assets/core.js"></script>
+<script>
+(function () {
+  let domain = '';
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function render() {
+    const st = DIB.get().settings;
+    document.getElementById('siteName').textContent = st.siteName;
+    document.querySelectorAll('.siteNameF').forEach(e => e.textContent = st.siteName);
+    document.title = st.siteName + ' · משחקי שפה ודיבור';
+    document.getElementById('tagline').textContent = st.tagline;
+    document.getElementById('statWords').textContent = DIB.words().length.toLocaleString('he-IL');
+    document.getElementById('statCats').textContent = DIB.categories().length;
+    document.getElementById('statWords').textContent = (DIB.words().length + DIB.items('artic').length + DIB.items('uses').length).toLocaleString('he-IL');
+    document.getElementById('statSent').textContent = DIB.items('sentences').length;
+    document.getElementById('statGames').textContent = DIB.games().length;
+    const dm = document.getElementById('domains');
+    dm.innerHTML = '<button data-d="" class="' + (!domain ? 'on' : '') + '">הכל</button>' + Object.keys(DIB_DOMAINS).map(k => '<button data-d="' + k + '" class="' + (domain === k ? 'on' : '') + '">' + DIB_DOMAINS[k].emoji + ' ' + DIB_DOMAINS[k].name + '</button>').join('');
+    dm.querySelectorAll('button').forEach(b => b.onclick = () => { domain = b.dataset.d; render(); });
+
+    const u = DIB.currentUser();
+    const ua = document.getElementById('userArea');
+    ua.innerHTML = u
+      ? '<span class="user-pill"><span class="chip">👋 ' + DIB.esc(u.name) + '</span><button class="btn btn-ghost btn-sm" id="logout">יציאה</button></span>'
+      : (st.requireLogin ? '<button class="btn btn-ghost btn-sm" id="login">כניסה עם קוד</button>' : '');
+    const lo = document.getElementById('logout'); if (lo) lo.onclick = () => { DIB.logout(); render(); };
+    const li = document.getElementById('login'); if (li) li.onclick = () => DIB.loginDialog({ cancel: '#' }).then(render);
+
+    const grid = document.getElementById('gameGrid');
+    const minis = ['🍎', '🚗', '🐶', '⭐'];
+    const MINI = { path: ['⭐', '🎲', '🌳', '🏁'], bubbles: ['🫧', '⭐', '🫧', '🎯'], memory: ['👦', '🍎', '👧', '🃏'], monster: ['🍪', '🗣️', '🍩', '👄'], vocab: minis };
+    grid.innerHTML = DIB.games().filter(g => !domain || (g.domains || []).includes(domain)).map(g => {
+      const locked = !DIB.canPlay(u, g.id);
+      return '<a class="game" href="' + g.url + '">' +
+        '<div class="art" style="background:linear-gradient(140deg,' + g.color + '22,' + g.color + '44)">' +
+        (MINI[g.id] || minis).map((m, i) => '<span class="mini" style="' + ['top:18px;right:22px', 'bottom:18px;right:40px', 'top:24px;left:30px', 'bottom:22px;left:22px'][i] + '">' + m + '</span>').join('') +
+        '<span class="em">' + g.emoji + '</span></div>' +
+        '<div class="body"><h3>' + DIB.esc(g.name) + '</h3><p>' + DIB.esc(g.desc) + '</p>' +
+        '<div class="tags">' + (g.domains || []).map(d => '<span class="chip" style="background:' + DIB_DOMAINS[d].color + '1f;color:' + DIB_DOMAINS[d].color + '">' + DIB_DOMAINS[d].emoji + ' ' + DIB_DOMAINS[d].name + '</span>').join('') + g.skills.map(k => '<span class="chip gray">' + DIB.esc(k) + '</span>').join('') + '<span class="chip gray">גילאי ' + DIB.esc(g.ages) + '</span></div>' +
+        '<div class="go"><span>' + (locked ? '🔒 כניסה עם קוד' : 'למשחק') + '</span><span>←</span></div></div></a>';
+    }).join('') +
+    '<div class="game soon"><div class="em">✨</div><h3>משחקים נוספים בדרך</h3><p class="muted">הבנת הוראות, שאלות, סיפור ועוד.</p></div>';
+  }
+
+  render();
+  DIB.on('change', render);
+  const top = document.getElementById('top');
+  addEventListener('scroll', () => top.classList.toggle('scrolled', scrollY > 8), { passive: true });
+})();
+</script>
+</body>
+</html>

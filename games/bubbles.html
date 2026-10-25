@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>בועות קסומות · דיבוריקה</title>
+<meta name="theme-color" content="#5B5BD6">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫧</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/game.css">
+<style>
+  .stage { position: fixed; inset: 0; overflow: hidden; background: linear-gradient(180deg, #7DD3FC 0%, #A5B4FC 55%, #C4B5FD 100%); touch-action: none; user-select: none; -webkit-user-select: none; }
+  .stage::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 15% 20%, #fff6 0, transparent 25%), radial-gradient(circle at 85% 35%, #fff4 0, transparent 22%); pointer-events: none; }
+  .hud { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; z-index: 10; gap: 12px; }
+  .goal { display: flex; gap: 4px; background: #ffffffd0; padding: 6px 10px; border-radius: 99px; box-shadow: var(--shadow); flex-wrap: wrap; justify-content: center; max-width: 60vw; }
+  .goal i { font-style: normal; font-family: var(--emoji); font-size: 1.1rem; filter: grayscale(1); opacity: .3; transition: .3s; }
+  .goal i.on { filter: none; opacity: 1; transform: scale(1.15); }
+  .bubble { position: absolute; left: 0; top: 0; border-radius: 50%; will-change: transform; display: grid; place-items: center; pointer-events: none;
+    background: radial-gradient(circle at 32% 28%, #ffffffee 0 9%, #ffffff55 14%, transparent 34%), radial-gradient(circle at 50% 50%, hsla(var(--h), 90%, 75%, .18) 55%, hsla(var(--h), 90%, 70%, .55) 72%, hsla(var(--h), 95%, 90%, .9) 100%);
+    box-shadow: inset 0 0 18px #ffffff70, 0 6px 18px -8px #0003; }
+  .bubble.star { background: radial-gradient(circle at 32% 28%, #ffffffee 0 9%, #ffffff55 14%, transparent 34%), radial-gradient(circle at 50% 50%, #FFE58A55 50%, #FFC24Baa 75%, #FFF2C2 100%); }
+  .bubble.star span { font-family: var(--emoji); font-size: var(--fs); animation: twinkle 1.6s ease-in-out infinite; }
+  @keyframes twinkle { 50% { transform: scale(1.18) rotate(12deg); } }
+  .pop { position: absolute; pointer-events: none; border-radius: 50%; border: 4px solid #fff; animation: popring .4s ease-out forwards; }
+  @keyframes popring { from { transform: translate(-50%, -50%) scale(.6); opacity: 1; } to { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
+  .drop { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #fff; pointer-events: none; animation: drop .55s ease-out forwards; }
+  @keyframes drop { to { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0; } }
+  .cannon { position: absolute; bottom: -12px; left: 50%; width: 120px; height: 120px; transform: translateX(-50%); z-index: 8; pointer-events: none; }
+  .barrel { position: absolute; left: 50%; bottom: 46px; width: 38px; height: 92px; margin-left: -19px; border-radius: 19px 19px 10px 10px; background: linear-gradient(90deg, #4343B8, #7C7CF0 45%, #4343B8); transform-origin: 50% 100%; transition: transform .12s; box-shadow: 0 4px 10px #0003; }
+  .barrel::before { content: ''; position: absolute; top: 8px; left: 4px; right: 4px; height: 8px; border-radius: 4px; background: #FFC24B; }
+  .base { position: absolute; left: 50%; bottom: 0; width: 120px; height: 70px; margin-left: -60px; border-radius: 60px 60px 16px 16px; background: linear-gradient(180deg, #FF9A7A, #FF7A59); box-shadow: 0 6px 16px #0003; display: grid; place-items: center; font-family: var(--emoji); font-size: 1.8rem; padding-bottom: 8px; }
+  .shot { position: absolute; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #FFC24B 60%, #F59E0B); box-shadow: 0 0 12px #FFC24B; pointer-events: none; z-index: 7; }
+  .tap-hint { position: absolute; bottom: 140px; left: 50%; transform: translateX(-50%); background: #fff; padding: 10px 18px; border-radius: 99px; font-weight: 700; box-shadow: var(--shadow-lg); z-index: 9; animation: float 2s ease-in-out infinite; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="../data/words.js"></script>
+<script src="../data/uses.js"></script>
+<script src="../data/artic.js"></script>
+<script src="../data/games.js"></script>
+<script src="../assets/core.js"></script>
+<script src="../assets/content.js"></script>
+<script>
+(async function () {
+  'use strict';
+  const GAME = 'bubbles';
+  const app = document.getElementById('app');
+  try { await DIB.gate(GAME); } catch (e) { return; }
+
+  const setup = DIBC.setupScreen(app, {
+    game: GAME, title: 'בועות קסומות', emoji: '🫧',
+    intro: 'יורים על בועות. בכל בועה עם כוכב מחכה מילה, עם תמונה והקראה.',
+    sources: ['words', 'uses', 'artic', 'list'],
+    defaults: { src: 'words', cats: [], level: 3, goal: 10, speed: 2, rate: 2 },
+    options: cfg =>
+      DIBC.optSeg('כמה מילים במשחק', 'goal', [5, 10, 15, 20], cfg.goal) +
+      DIBC.optSeg('מהירות הבועות', 'speed', [[1, 'איטי'], [2, 'רגיל'], [3, 'מהיר']], cfg.speed) +
+      DIBC.optSeg('בועות עם כוכב', 'rate', [[1, 'מעט'], [2, 'הרבה'], [3, 'כמעט כולן']], cfg.rate),
+    onStart: start
+  });
+
+  function start(cfg, all) {
+    const cards = DIB.shuffle(all);
+    const goal = Math.min(cfg.goal, Math.max(cards.length, cfg.goal));
+    const speed = [0, 42, 70, 105][cfg.speed];
+    const starP = [0, .3, .5, .8][cfg.rate];
+    let ci = 0, got = 0, paused = false, over = false, shots = 0;
+    const seen = [], bubbles = [];
+    const t0 = Date.now();
+
+    app.innerHTML = '<div class="stage" id="st">' +
+      '<div class="hud"><button class="btn btn-outline btn-icon" id="quit" aria-label="יציאה" style="background:#fff">✕</button>' +
+      '<div class="goal" id="goal">' + '<i>⭐</i>'.repeat(goal) + '</div><span style="width:44px"></span></div>' +
+      '<div class="tap-hint" id="th">👆 נוגעים בבועה עם כוכב</div>' +
+      '<div class="cannon"><div class="barrel" id="barrel"></div><div class="base">🎯</div></div></div>';
+    const st = app.querySelector('#st'), barrel = app.querySelector('#barrel');
+    app.querySelector('#quit').onclick = () => { if (!got || confirm('לצאת מהמשחק?')) end(true); };
+
+    function W() { return st.clientWidth; } function H() { return st.clientHeight; }
+
+    function spawn() {
+      const r = Math.round(Math.min(W(), 700) * (0.07 + Math.random() * 0.05)) + 24;
+      const starNow = Math.random() < starP || !bubbles.some(b => b.star);
+      const el = document.createElement('div');
+      el.className = 'bubble' + (starNow ? ' star' : '');
+      el.style.width = el.style.height = r * 2 + 'px';
+      el.style.setProperty('--h', Math.floor(Math.random() * 360));
+      el.style.setProperty('--fs', Math.round(r * 0.95) + 'px');
+      if (starNow) el.innerHTML = '<span>⭐</span>';
+      st.appendChild(el);
+      bubbles.push({ el, r, x: r + Math.random() * (W() - 2 * r), y: H() + r, vy: speed * (0.8 + Math.random() * 0.5), ph: Math.random() * 6, amp: 10 + Math.random() * 18, star: starNow, alive: true });
+    }
+
+    let last = performance.now(), spawnT = 0;
+    function loop(now) {
+      if (over) return;
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      if (!paused) {
+        spawnT -= dt;
+        const maxB = Math.max(4, Math.round(W() / 140));
+        if (spawnT <= 0 && bubbles.length < maxB) { spawn(); spawnT = 0.7 + Math.random() * 0.6; }
+        for (let i = bubbles.length - 1; i >= 0; i--) {
+          const b = bubbles[i];
+          b.y -= b.vy * dt; b.ph += dt * 1.6;
+          const x = b.x + Math.sin(b.ph) * b.amp;
+          b.cx = x; b.cy = b.y;
+          b.el.style.transform = 'translate(' + (x - b.r) + 'px,' + (b.y - b.r) + 'px)';
+          if (b.y < -b.r) { b.el.remove(); bubbles.splice(i, 1); }
+        }
+      }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    st.addEventListener('pointerdown', e => {
+      if (paused || over || e.target.closest('.hud')) return;
+      const rect = st.getBoundingClientRect();
+      const px = e.clientX - rect.left, py = e.clientY - rect.top;
+      const ox = W() / 2, oy = H() - 70;
+      const ang = Math.atan2(px - ox, oy - py);
+      barrel.style.transform = 'rotate(' + Math.max(-1.3, Math.min(1.3, ang)) + 'rad)';
+      app.querySelector('#th') && app.querySelector('#th').remove();
+      // הבועה הקרובה ביותר לנקודת הנגיעה, עם מרווח טעות נדיב לאצבעות קטנות
+      let target = null, best = Infinity;
+      bubbles.forEach(b => { if (!b.alive) return; const d = Math.hypot(b.cx - px, b.cy - py); if (d < b.r + 26 && d < best) { best = d; target = b; } });
+      fire(ox, oy, target, px, py);
+    });
+
+    function fire(ox, oy, target, px, py) {
+      shots++;
+      DIB.sfx.tap();
+      const s = document.createElement('div');
+      s.className = 'shot'; st.appendChild(s);
+      if (target) target.alive = false;
+      const T = 230, t1 = performance.now();
+      (function step(now) {
+        const k = Math.min(1, (now - t1) / T);
+        const tx = target ? target.cx : px, ty = target ? target.cy : py;
+        s.style.left = (ox + (tx - ox) * k) + 'px'; s.style.top = (oy + (ty - oy) * k) + 'px';
+        if (k < 1) return requestAnimationFrame(step);
+        s.remove();
+        if (target) pop(target);
+      })(t1);
+    }
+
+    async function pop(b) {
+      const i = bubbles.indexOf(b); if (i >= 0) bubbles.splice(i, 1);
+      b.el.remove();
+      const ring = document.createElement('div');
+      ring.className = 'pop'; ring.style.left = b.cx + 'px'; ring.style.top = b.cy + 'px'; ring.style.width = ring.style.height = b.r * 2 + 'px';
+      st.appendChild(ring); setTimeout(() => ring.remove(), 450);
+      for (let k = 0; k < 10; k++) {
+        const d = document.createElement('div'); d.className = 'drop';
+        const a = k / 10 * Math.PI * 2;
+        d.style.left = b.cx + 'px'; d.style.top = b.cy + 'px';
+        d.style.setProperty('--dx', Math.cos(a) * b.r * 1.3 + 'px'); d.style.setProperty('--dy', Math.sin(a) * b.r * 1.3 + 'px');
+        if (b.star) d.style.background = '#FFC24B';
+        st.appendChild(d); setTimeout(() => d.remove(), 600);
+      }
+      if (!b.star) { DIB.sfx.bad && tonePop(); return; }
+      DIB.sfx.good();
+      paused = true;
+      const c = cards[ci++ % cards.length];
+      await DIBC.popup(c);
+      seen.push(c); got++;
+      const gi = app.querySelectorAll('#goal i')[got - 1]; if (gi) { gi.classList.add('on'); gi.textContent = ''; gi.innerHTML = DIB.pic({ word: c.text, emoji: c.emoji || '⭐', img: c.img, pics: c.pics }); }
+      if (got >= goal) return end(false);
+      last = performance.now();
+      paused = false;
+    }
+    function tonePop() { DIB.sfx.tap(); }
+
+    function end(early) {
+      over = true;
+      const secs = Math.round((Date.now() - t0) / 1000);
+      if (seen.length) DIB.logSession({ game: GAME, label: 'בועות · ' + DIBC.describe(cfg), patient: cfg.patient || '', total: seen.length, correct: seen.length, cued: 0, missed: [], words: seen.map(c => c.text), secs, early: !!early });
+      if (early && !seen.length) return setup.redraw();
+      DIBC.endScreen(app, {
+        stars: early ? 2 : 3, trophy: early ? '👏' : '🫧', title: early ? 'יופי של משחק!' : 'אספתם את כל הכוכבים!',
+        sub: DIBC.describe(cfg), say: early ? 'יופי של משחק!' : 'כל הכבוד! אספתם את כל הכוכבים!',
+        kpis: [[seen.length, 'מילים'], [shots, 'יריות'], [secs >= 60 ? Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') : secs + '״', 'זמן']],
+        words: seen, wordsTitle: 'המילים שגילינו (לוחצים לשמוע)',
+        onAgain: () => start(cfg, all), onSettings: setup.redraw
+      });
+    }
+  }
+})();
+</script>
+</body>
+</html>

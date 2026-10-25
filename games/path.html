@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>מסלול הכוכבים · דיבוריקה</title>
+<meta name="theme-color" content="#5B5BD6">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌟</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/game.css">
+<style>
+  .chars { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chars button { width: 54px; height: 54px; border-radius: 16px; border: 2px solid var(--line); background: #fff; font-family: var(--emoji); font-size: 1.8rem; cursor: pointer; }
+  .chars button.on { border-color: var(--brand); background: var(--brand-soft); transform: translateY(-2px); }
+
+  .game { min-height: 100vh; display: flex; flex-direction: column; }
+  .arena { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 6px 0 24px; }
+  .board { position: relative; width: min(100%, calc((100vh - 230px) * var(--ar))); aspect-ratio: var(--ar); border-radius: 34px; background: radial-gradient(circle at 20% 15%, #fff8 0, transparent 30%), linear-gradient(160deg, #D9F7E8, #BEEBD5 55%, #A7E0C4); box-shadow: var(--shadow-lg), inset 0 0 0 6px #ffffff80; }
+  .board svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .deco { position: absolute; font-family: var(--emoji); font-size: clamp(1.2rem, 3vw, 2rem); opacity: .55; pointer-events: none; }
+  .tile { position: absolute; width: calc(100% / var(--cols) * .62); aspect-ratio: 1; transform: translate(50%, -50%); border-radius: 50%; background: #fff; box-shadow: 0 4px 0 #0000001a, 0 6px 14px -6px #0004; display: grid; place-items: center; font-family: var(--emoji); font-size: calc(var(--cell) * .3); transition: transform .2s, background .3s; }
+  .tile.star { background: linear-gradient(140deg, #FFE38A, #FFC24B); box-shadow: 0 4px 0 #D99A1E, 0 6px 14px -6px #0005; }
+  .tile.star::before { content: '⭐'; animation: twinkle 2.2s ease-in-out infinite; }
+  .tile.got { background: #fff; box-shadow: 0 0 0 4px var(--sun), 0 4px 0 #0000001a; }
+  .tile.got::before { content: none; }
+  .tile.got .pic-emoji, .tile.got .pic-letter, .tile.got .pic-multi { font-size: 1em; }
+  .tile.got .pic-img { width: 70%; height: 70%; border-radius: 30%; }
+  .tile.start, .tile.finish { background: linear-gradient(140deg, #C7C6FF, #8B87FF); color: #fff; }
+  .tile.finish { background: linear-gradient(140deg, #FFB199, #FF7A59); }
+  .tile.pulse { animation: land .5s; }
+  @keyframes twinkle { 50% { transform: scale(1.15) rotate(10deg); } }
+  @keyframes land { 40% { transform: translate(50%, -50%) scale(1.25); } }
+
+  .token { position: absolute; width: calc(100% / var(--cols) * .7); aspect-ratio: 1; transform: translate(50%, -78%); transition: right .3s ease, top .3s ease; z-index: 5; pointer-events: none; display: grid; place-items: center; }
+  .token span { font-family: var(--emoji); font-size: calc(var(--cell) * .48); filter: drop-shadow(0 6px 4px #0003); }
+  .token.hop span { animation: hop .3s ease; }
+  @keyframes hop { 50% { transform: translateY(-40%) scale(1.08); } }
+
+  .controls { display: flex; align-items: center; gap: 18px; }
+  .die { width: 96px; height: 96px; border-radius: 26px; border: 0; background: #fff; box-shadow: 0 6px 0 #D9D6E8, var(--shadow-lg); cursor: pointer; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 16px; gap: 2px; transition: transform .1s; }
+  .die:active { transform: translateY(4px); box-shadow: 0 2px 0 #D9D6E8, var(--shadow); }
+  .die[disabled] { opacity: .6; cursor: default; }
+  .die i { width: 15px; height: 15px; border-radius: 50%; background: var(--ink); place-self: center; visibility: hidden; }
+  .die i.on { visibility: visible; }
+  .die.rolling { animation: roll .5s linear; }
+  @keyframes roll { 25% { transform: rotate(90deg) scale(.9); } 50% { transform: rotate(180deg); } 75% { transform: rotate(270deg) scale(.9); } 100% { transform: rotate(360deg); } }
+  .hint { font-weight: 700; color: var(--ink-2); font-size: 1.1rem; }
+  .hint .em { font-family: var(--emoji); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="../data/words.js"></script>
+<script src="../data/uses.js"></script>
+<script src="../data/artic.js"></script>
+<script src="../data/games.js"></script>
+<script src="../assets/core.js"></script>
+<script src="../assets/content.js"></script>
+<script>
+(async function () {
+  'use strict';
+  const GAME = 'path';
+  const app = document.getElementById('app');
+  try { await DIB.gate(GAME); } catch (e) { return; }
+
+  const CHARS = ['🐰', '🦊', '🐸', '🦄', '🐶', '🚗', '🐢', '🦖'];
+  const DOTS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+
+  const setup = DIBC.setupScreen(app, {
+    game: GAME, title: 'מסלול הכוכבים', emoji: '🌟',
+    intro: 'זורקים קובייה ומתקדמים במסלול. כל כוכב שנוחתים עליו מגלה מילה, עם תמונה והקראה.',
+    sources: ['words', 'uses', 'artic', 'list'],
+    defaults: { src: 'words', cats: [], level: 3, length: 20, every: 2, die: 3, char: '🐰' },
+    options: cfg =>
+      DIBC.optSeg('אורך המסלול', 'length', [[12, 'קצר'], [20, 'בינוני'], [30, 'ארוך']], cfg.length) +
+      DIBC.optSeg('כמה כוכבים', 'every', [[1, 'בכל משבצת'], [2, 'הרבה'], [3, 'פחות']], cfg.every) +
+      DIBC.optSeg('קובייה', 'die', [[3, '1 עד 3'], [6, '1 עד 6']], cfg.die) +
+      '<div><span class="opt-label">הדמות</span><div class="chars">' + CHARS.map(c => '<button class="' + (cfg.char === c ? 'on' : '') + '" data-char="' + c + '">' + c + '</button>').join('') + '</div></div>',
+    bindOptions: (root, cfg, redraw, persist) => root.querySelectorAll('[data-char]').forEach(b => b.onclick = () => { cfg.char = b.dataset.char; persist(); redraw(); }),
+    onStart: start
+  });
+
+  function start(cfg, all) {
+    const N = cfg.length;
+    const cards = DIB.shuffle(all);
+    const narrow = innerWidth < 640;
+    const cols = narrow ? 4 : 6;
+    const rows = Math.ceil(N / cols);
+    const cell = Math.min(innerWidth - 36, (innerHeight - 230) * cols / rows) / cols;
+    const pos = [];
+    for (let i = 0; i < N; i++) {
+      const r = Math.floor(i / cols), k = i % cols;
+      const c = r % 2 === 0 ? k : cols - 1 - k; // נחש: שורה אחת מימין לשמאל, הבאה בחזרה
+      pos.push({ x: (c + 0.5) / cols, y: (rows - r - 0.5) / rows, cx: cols - c - 0.5, cy: rows - r - 0.5 });
+    }
+    const stars = new Set();
+    for (let i = 1; i < N - 1; i++) if (i % cfg.every === 0) stars.add(i);
+    let at = 0, busy = false, ci = 0;
+    const seen = [];
+    const t0 = Date.now();
+
+    const deco = ['🌳', '🌸', '☁️', '🍄', '🌼', '🦋'];
+    app.innerHTML =
+      '<div class="wrap game"><div class="bar"><button class="btn btn-outline btn-icon" id="quit" aria-label="יציאה">✕</button>' +
+      '<b>🌟 מסלול הכוכבים</b><span class="score"><span class="em">⭐</span><span id="sc">0</span></span></div>' +
+      '<div class="arena"><div class="board" id="board" style="--ar:' + (cols / rows) + ';--cols:' + cols + ';--cell:' + cell + 'px">' +
+      '<svg viewBox="0 0 ' + cols + ' ' + rows + '" preserveAspectRatio="none" aria-hidden="true">' +
+      '<polyline points="' + pos.map(p => p.cx + ',' + p.cy).join(' ') + '" fill="none" stroke="#ffffffb0" stroke-width="' + (0.34) + '" stroke-linecap="round" stroke-linejoin="round" vector-effect="none"/>' +
+      '<polyline points="' + pos.map(p => p.cx + ',' + p.cy).join(' ') + '" fill="none" stroke="#9ED8BC" stroke-width="0.05" stroke-dasharray="0.12 0.12" stroke-linecap="round"/></svg>' +
+      deco.map((d, i) => '<span class="deco" style="right:' + [2, 90, 48, 4, 92, 30][i] + '%;top:' + [3, 4, 0, 88, 86, 92][i] + '%">' + d + '</span>').join('') +
+      pos.map((p, i) => '<div class="tile' + (i === 0 ? ' start' : i === N - 1 ? ' finish' : stars.has(i) ? ' star' : '') + '" data-i="' + i + '" style="right:' + (p.x * 100) + '%;top:' + (p.y * 100) + '%">' + (i === 0 ? '🏁' : i === N - 1 ? '🏆' : '') + '</div>').join('') +
+      '<div class="token" id="tok"><span>' + cfg.char + '</span></div></div>' +
+      '<div class="controls"><button class="die" id="die" aria-label="זריקת קובייה">' + '<i></i>'.repeat(9) + '</button><span class="hint" id="hint"><span class="em">👆</span> לוחצים על הקובייה</span></div></div></div>';
+    const tok = app.querySelector('#tok'), die = app.querySelector('#die'), hint = app.querySelector('#hint');
+    const place = i => { tok.style.right = (pos[i].x * 100) + '%'; tok.style.top = (pos[i].y * 100) + '%'; };
+    const face = n => die.querySelectorAll('i').forEach((d, k) => d.classList.toggle('on', DOTS[n].includes(k)));
+    place(0); face(1);
+    app.querySelector('#quit').onclick = () => { if (!seen.length || confirm('לצאת מהמשחק?')) finish(true); };
+
+    die.onclick = async () => {
+      if (busy) return;
+      busy = true; die.disabled = true; hint.textContent = '';
+      die.classList.add('rolling');
+      let n = 1;
+      for (let k = 0; k < 6; k++) { n = 1 + Math.floor(Math.random() * cfg.die); face(n); DIB.sfx.tap(); await wait(80); }
+      die.classList.remove('rolling');
+      hint.textContent = n + '!';
+      DIB.speak(String(n), { rate: 1 });
+      await wait(350);
+      for (let s = 0; s < n && at < N - 1; s++) {
+        at++; place(at);
+        tok.classList.remove('hop'); void tok.offsetWidth; tok.classList.add('hop');
+        DIB.sfx.tap();
+        await wait(330);
+      }
+      const tile = app.querySelector('.tile[data-i="' + at + '"]');
+      tile.classList.remove('pulse'); void tile.offsetWidth; tile.classList.add('pulse');
+      if (stars.has(at) && !tile.classList.contains('got')) {
+        const c = cards[ci++ % cards.length];
+        DIB.sfx.good();
+        await wait(250);
+        await DIBC.popup(c);
+        seen.push(c);
+        tile.classList.remove('star'); tile.classList.add('got');
+        tile.innerHTML = DIB.pic({ word: c.text, emoji: c.emoji, img: c.img, pics: c.pics });
+        app.querySelector('#sc').textContent = seen.length;
+      }
+      if (at >= N - 1) { await wait(400); return finish(false); }
+      busy = false; die.disabled = false;
+      hint.innerHTML = '<span class="em">👆</span> עוד פעם!';
+    };
+
+    function finish(early) {
+      const secs = Math.round((Date.now() - t0) / 1000);
+      if (seen.length) DIB.logSession({ game: GAME, label: 'מסלול · ' + DIBC.describe(cfg), patient: cfg.patient || '', total: seen.length, correct: seen.length, cued: 0, missed: [], words: seen.map(c => c.text), secs, early: !!early });
+      if (early && !seen.length) return setup.redraw();
+      DIBC.endScreen(app, {
+        stars: early ? 2 : 3, trophy: early ? '👏' : '🏆', title: early ? 'יופי של משחק!' : 'הגעתם לסוף המסלול!',
+        sub: DIBC.describe(cfg), say: early ? 'יופי של משחק!' : 'כל הכבוד! הגעתם לסוף המסלול!',
+        kpis: [[seen.length, 'מילים שגילינו'], [secs >= 60 ? Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') : secs + '״', 'זמן']],
+        words: seen, wordsTitle: 'המילים שגילינו (לוחצים לשמוע)',
+        onAgain: () => start(cfg, all), onSettings: setup.redraw
+      });
+    }
+  }
+
+  function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+})();
+</script>
+</body>
+</html>

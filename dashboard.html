@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>דשבורד · דיבוריקה</title>
+<meta name="theme-color" content="#1E2145">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  body { background: #F6F4FA; }
+  .layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+  aside.side { background: var(--ink); color: #fff; padding: 20px 14px; position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 4px; }
+  .side .logo { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 800; font-size: 1.2rem; padding: 4px 10px 18px; }
+  .side .logo i { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--brand), #8B5CF6); display: grid; place-items: center; font-style: normal; font-family: var(--emoji); }
+  .side .logo small { display: block; font-weight: 500; font-size: .75rem; opacity: .6; }
+  .nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: transparent; color: rgba(255,255,255,.72); padding: 11px 12px; border-radius: 12px; cursor: pointer; font-weight: 500; text-align: right; }
+  .nav-btn .em { font-family: var(--emoji); font-size: 1.1rem; width: 24px; text-align: center; }
+  .nav-btn:hover { background: rgba(255,255,255,.07); color: #fff; }
+  .nav-btn.on { background: rgba(255,255,255,.12); color: #fff; font-weight: 700; }
+  .nav-btn .count { margin-inline-start: auto; background: rgba(255,255,255,.12); padding: 0 8px; border-radius: 99px; font-size: .75rem; }
+  .side .spacer { flex: 1; }
+  .side .me { border-top: 1px solid rgba(255,255,255,.1); padding: 14px 10px 0; font-size: .85rem; color: rgba(255,255,255,.7); display: grid; gap: 8px; }
+  .side .me a, .side .me button { color: #fff; background: rgba(255,255,255,.08); border: 0; border-radius: 10px; padding: 8px 10px; text-decoration: none; cursor: pointer; text-align: center; }
+
+  main.content { padding: 28px clamp(16px, 3vw, 40px) 60px; min-width: 0; }
+  .page-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+  .page-head h1 { font-size: 1.8rem; font-weight: 800; margin: 0; }
+  .page-head p { margin: 4px 0 0; color: var(--muted); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .banner { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 18px; margin-bottom: 18px; background: var(--sun-soft); color: #6B4500; flex-wrap: wrap; }
+  .banner .em { font-family: var(--emoji); font-size: 1.5rem; }
+  .banner.info { background: var(--brand-soft); color: var(--brand-ink); }
+  .banner p { margin: 0; flex: 1; min-width: 220px; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 20px; }
+  .kpi { background: #fff; border-radius: 20px; padding: 18px; box-shadow: var(--shadow); display: flex; gap: 14px; align-items: center; }
+  .kpi .ic { width: 48px; height: 48px; border-radius: 15px; display: grid; place-items: center; font-family: var(--emoji); font-size: 1.4rem; flex: none; }
+  .kpi b { font-size: 1.7rem; font-weight: 800; display: block; line-height: 1.1; }
+  .kpi span { color: var(--muted); font-size: .85rem; }
+  .two { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+  @media (max-width: 1000px) { .two { grid-template-columns: 1fr; } }
+  .card h2 { font-size: 1.1rem; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; background: #fff; padding: 12px; border-radius: 18px; box-shadow: var(--shadow); }
+  .toolbar .input { width: auto; min-width: 0; flex: 1 1 180px; }
+  .toolbar select.input { flex: 0 1 190px; }
+  .result-count { color: var(--muted); font-size: .9rem; margin-bottom: 10px; }
+
+  .wgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .wcard { background: #fff; border-radius: 18px; box-shadow: var(--shadow); padding: 14px 10px 10px; text-align: center; position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 2px solid transparent; transition: .15s; cursor: pointer; }
+  .wcard:hover { border-color: var(--brand-soft); transform: translateY(-2px); }
+  .wcard .pic-emoji { font-size: 2.8rem; }
+  .wcard .pic-img { width: 64px; height: 64px; border-radius: 10px; }
+  .wcard .w { font-weight: 700; }
+  .wcard .meta { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+  .wcard .meta .chip { font-size: .7rem; padding: .1em .55em; }
+  .wcard.off { opacity: .5; background: #FAF9FC; }
+  .wcard .c2 { color: var(--brand-ink); font-weight: 600; font-size: .9rem; margin-top: -4px; }
+  .wcard .pic-multi, .wcard .pic-letter { font-size: 2.8rem; }
+  .wgrid.wide { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+  .emoji-prev .pic-multi, .emoji-prev .pic-letter { font-size: 3rem; }
+  .wcard .badge { position: absolute; top: 8px; left: 8px; font-size: .65rem; }
+  .wcard .quick { position: absolute; top: 6px; right: 6px; display: none; }
+  .wcard:hover .quick, .wcard:focus-within .quick { display: block; }
+
+  table.tbl { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  .tbl th { text-align: right; font-weight: 600; color: var(--muted); font-size: .8rem; padding: 10px 12px; border-bottom: 1.5px solid var(--line); white-space: nowrap; }
+  .tbl td { padding: 12px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  .tbl tr:last-child td { border-bottom: 0; }
+  .tbl-wrap { background: #fff; border-radius: 20px; box-shadow: var(--shadow); overflow: auto; }
+  .code { font-family: ui-monospace, Menlo, Consolas, monospace; background: var(--bg-2); padding: 3px 10px; border-radius: 8px; font-weight: 700; letter-spacing: .1em; direction: ltr; display: inline-block; }
+  .bar-mini { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; width: 90px; display: inline-block; vertical-align: middle; margin-inline-end: 8px; }
+  .bar-mini i { display: block; height: 100%; background: var(--mint); }
+
+  .glist { display: grid; gap: 16px; }
+  .gitem { background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 20px; display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; }
+  .gitem .art { width: 72px; height: 72px; border-radius: 22px; display: grid; place-items: center; font-family: var(--emoji); font-size: 2.3rem; }
+  .gitem h3 { margin: 0 0 4px; font-size: 1.2rem; }
+  .gitem p { margin: 0; color: var(--muted); font-size: .92rem; }
+  .gitem .defs { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px 22px; }
+  .gitem .defs .opt-label { font-weight: 600; font-size: .85rem; color: var(--ink-2); display: block; margin-bottom: 6px; }
+
+  .clist { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+  .citem { background: #fff; border-radius: 18px; box-shadow: var(--shadow); padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-inline-start: 5px solid var(--c); }
+  .citem .em { font-family: var(--emoji); font-size: 1.8rem; }
+  .citem .nm { flex: 1; min-width: 0; }
+  .citem .nm b { display: block; }
+  .citem.off { opacity: .5; }
+
+  .recent { display: grid; gap: 10px; }
+  .recent .r { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--bg); }
+  .recent .r .em { font-family: var(--emoji); font-size: 1.4rem; }
+  .recent .r .t { flex: 1; min-width: 0; }
+  .recent .r .t b { display: block; font-size: .95rem; }
+  .recent .r .t span { color: var(--muted); font-size: .8rem; }
+  .pct { font-weight: 800; }
+  .pct.hi { color: #11795F; } .pct.mid { color: #9A6100; } .pct.lo { color: var(--danger); }
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty .em { font-family: var(--emoji); font-size: 3rem; display: block; margin-bottom: 8px; }
+
+  .emoji-row { display: flex; gap: 10px; align-items: center; }
+  .emoji-prev { width: 84px; height: 84px; border-radius: 20px; background: var(--bg-2); display: grid; place-items: center; flex: none; overflow: hidden; }
+  .emoji-prev .pic-emoji { font-size: 3rem; }
+  .emoji-prev .pic-img { width: 100%; height: 100%; object-fit: cover; }
+  .emoji-quick { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .emoji-quick button { border: 0; background: var(--bg); border-radius: 8px; font-family: var(--emoji); font-size: 1.2rem; width: 34px; height: 34px; cursor: pointer; }
+  .gamechecks { display: grid; gap: 8px; padding: 12px; border-radius: 14px; background: var(--bg); }
+
+  .mobile-top { display: none; }
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: 1fr; }
+    aside.side { position: fixed; inset: 0 0 0 auto; width: 270px; z-index: 50; transform: translateX(100%); transition: transform .25s; height: 100vh; }
+    aside.side.open { transform: none; box-shadow: var(--shadow-lg); }
+    .mobile-top { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--ink); color: #fff; position: sticky; top: 0; z-index: 40; }
+    .mobile-top button { background: rgba(255,255,255,.1); color: #fff; border: 0; border-radius: 10px; padding: 8px 12px; font-size: 1.1rem; }
+    .gitem { grid-template-columns: auto 1fr; }
+    .gitem > .switch { grid-column: 2; justify-self: start; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="data/words.js"></script>
+<script src="data/uses.js"></script>
+<script src="data/sentences.js"></script>
+<script src="data/artic.js"></script>
+<script src="data/games.js"></script>
+<script src="assets/core.js"></script>
+<script src="assets/content.js"></script>
+<script>
+(async function () {
+  'use strict';
+  const esc = DIB.esc;
+  const root = document.getElementById('root');
+  const isAdmin = u => u && u.role === 'admin';
+
+  let me = DIB.currentUser();
+  if (!isAdmin(me)) {
+    me = await DIB.loginDialog({
+      title: 'כניסה לדשבורד', text: 'הדשבורד פתוח למנהלים בלבד. בפעם הראשונה הקוד הוא 1234.',
+      cancel: 'index.html', check: isAdmin, denied: 'לקוד הזה אין הרשאת ניהול.'
+    });
+  }
+
+  const PAGES = [
+    { id: 'overview', em: '📊', name: 'סקירה' },
+    { id: 'games', em: '🎮', name: 'משחקים' },
+    { id: 'words', em: '📚', name: 'מאגר מילים' },
+    { id: 'cats', em: '🗂️', name: 'קטגוריות' },
+    { id: 'uses', em: '🔑', name: 'חפץ ושימוש' },
+    { id: 'sentences', em: '💬', name: 'משפטים' },
+    { id: 'artic', em: '👄', name: 'היגוי' },
+    { id: 'users', em: '👥', name: 'משתמשים וגישה' },
+    { id: 'results', em: '📈', name: 'תוצאות ומעקב' },
+    { id: 'settings', em: '⚙️', name: 'הגדרות וגיבוי' }
+  ];
+  const MODE_NAMES = { find: 'איפה זה?', name: 'מה זה?', memory: 'זוגות', odd: 'מי לא שייך?' };
+  const MODE_EM = { find: '🔍', name: '🗣️', memory: '🃏', odd: '🧩' };
+  let page = (location.hash || '#overview').slice(1);
+  if (!PAGES.some(p => p.id === page)) page = 'overview';
+  const ui = { q: '', cat: '', filter: 'active', rq: '', rmode: '' };
+
+  function shell() {
+    const s = DIB.get();
+    root.innerHTML =
+      '<div class="mobile-top"><b>' + esc(s.settings.siteName) + ' · דשבורד</b><button id="menu" aria-label="תפריט">☰</button></div>' +
+      '<div class="layout"><aside class="side" id="side">' +
+      '<a class="logo" href="index.html"><i>💬</i><span>' + esc(s.settings.siteName) + '<small>דשבורד ניהול</small></span></a>' +
+      PAGES.map(p => '<button class="nav-btn' + (p.id === page ? ' on' : '') + '" data-p="' + p.id + '"><span class="em">' + p.em + '</span>' + p.name + counter(p.id) + '</button>').join('') +
+      '<div class="spacer"></div>' +
+      '<div class="me"><span>מחובר/ת: <b>' + esc(me.name) + '</b></span><a href="index.html">← לאתר</a><button id="logout">יציאה</button></div>' +
+      '</aside><main class="content" id="main"></main></div>';
+    root.querySelectorAll('[data-p]').forEach(b => b.onclick = () => go(b.dataset.p));
+    root.querySelector('#logout').onclick = () => { DIB.logout(); location.href = 'index.html'; };
+    root.querySelector('#menu').onclick = () => root.querySelector('#side').classList.toggle('open');
+    render();
+  }
+  function counter(id) {
+    const s = DIB.get();
+    const n = id === 'words' ? DIB.words().length : ['uses', 'sentences', 'artic'].includes(id) ? DIB.items(id).length : id === 'users' ? s.users.length : id === 'results' ? s.sessions.length : null;
+    return n == null ? '' : '<span class="count">' + n + '</span>';
+  }
+  function go(p) { page = p; history.replaceState(null, '', '#' + p); shell(); scrollTo(0, 0); }
+  function render() { const m = document.getElementById('main'); ({ overview, games, words, cats, users, results, settings, uses: m => collPage(m, 'uses'), sentences: m => collPage(m, 'sentences'), artic: m => collPage(m, 'artic') })[page](m); }
+  function refresh() { shell(); }
+
+  function head(title, sub, actions) {
+    return '<div class="page-head"><div><h1>' + title + '</h1>' + (sub ? '<p>' + sub + '</p>' : '') + '</div><div class="actions">' + (actions || '') + '</div></div>';
+  }
+  function pctCls(p) { return p >= 0.8 ? 'hi' : p >= 0.5 ? 'mid' : 'lo'; }
+  function gameOf(x) { return (window.DIB_GAMES || []).find(g => g.id === (x.game || 'vocab')) || {}; }
+  function sessName(x) { return x.label || ((gameOf(x).name || '') + (MODE_NAMES[x.mode] ? ' · ' + MODE_NAMES[x.mode] : '')); }
+  function sessEm(x) { return MODE_EM[x.mode] || gameOf(x).emoji || '🎮'; }
+  /** אחוז הצלחה, רק למשחקים שיש בהם נכון/לא נכון. */
+  function sessPct(x) {
+    if (x.game === 'path' || x.game === 'bubbles' || x.game === 'memory' || x.mode === 'memory') return null;
+    if (x.game === 'monster' && !x.rated) return null;
+    return x.total ? x.correct / x.total : 0;
+  }
+  function sessShort(x) {
+    if (x.game === 'path' || x.game === 'bubbles') return x.total + ' מילים';
+    if (x.game === 'memory' || x.mode === 'memory') return x.correct + ' זוגות' + (x.moves ? ' ב־' + x.moves + ' ניסיונות' : '');
+    if (x.game === 'monster' && !x.rated) return x.total + ' חזרות';
+    return null;
+  }
+
+  function modal(html, onReady) {
+    const d = document.createElement('dialog');
+    d.className = 'modal';
+    d.innerHTML = '<div class="modal-body">' + html + '</div>';
+    document.body.appendChild(d);
+    d.addEventListener('close', () => d.remove());
+    d.querySelectorAll('[data-close]').forEach(b => b.onclick = () => d.close());
+    d.showModal();
+    if (onReady) onReady(d);
+    return d;
+  }
+
+  /* ================= סקירה ================= */
+  function overview(m) {
+    const s = DIB.get();
+    const weekAgo = Date.now() - 7 * 864e5;
+    const week = s.sessions.filter(x => x.t > weekAgo);
+    const customN = s.words.custom.length + Object.keys(s.words.edits).length;
+    const admin = s.users.find(u => u.id === 'admin');
+    m.innerHTML = head('שלום ' + esc(me.name) + ' 👋', 'כאן שולטים בכל האתר: משחקים, מילים, משתמשים ותוצאות.') +
+      (admin && admin.code === '1234' ? '<div class="banner"><span class="em">🔑</span><p><b>הקוד שלך עדיין 1234.</b> כדאי להחליף אותו לפני ששולחים את האתר לאחרים.</p><button class="btn btn-sm btn-primary" id="chg">להחלפת הקוד</button></div>' : '') +
+      '<div class="banner info"><span class="em">💾</span><p>כרגע הנתונים נשמרים <b>בדפדפן הזה בלבד</b>. כדי שהשינויים יגיעו לכל המשתמשים במכשירים שלהם נחבר בשלב הבא מאגר משותף. עד אז אפשר להעביר הכל בקובץ גיבוי.</p><button class="btn btn-sm btn-outline" id="bk">גיבוי</button></div>' +
+      '<div class="kpis">' +
+      kpi('📚', 'var(--brand-soft)', DIB.words().length, 'מילים פעילות') +
+      kpi('✏️', 'var(--coral-soft)', customN, 'מילים שהוספתם או שיניתם') +
+      kpi('👥', 'var(--mint-soft)', s.users.filter(u => u.active).length, 'משתמשים פעילים') +
+      kpi('🎯', 'var(--sun-soft)', week.length, 'מפגשים השבוע') +
+      '</div>' +
+      '<div class="two"><div class="card"><h2>מפגשים אחרונים <button class="btn btn-ghost btn-sm" data-go="results">לכל התוצאות ←</button></h2>' + recentList(s.sessions.slice(0, 7)) + '</div>' +
+      '<div class="card"><h2>פעולות מהירות</h2><div style="display:grid;gap:10px">' +
+      '<button class="btn btn-outline" data-act="addword">➕ הוספת מילה</button>' +
+      '<button class="btn btn-outline" data-act="bulk">📋 הוספת הרבה מילים בבת אחת</button>' +
+      '<button class="btn btn-outline" data-act="adduser">👤 משתמש/ת חדש/ה עם קוד</button>' +
+      '<button class="btn btn-outline" data-go="artic">👄 רשימת היגוי חדשה</button>' +
+      '</div></div></div>';
+    const c = m.querySelector('#chg'); if (c) c.onclick = () => userModal(admin);
+    m.querySelector('#bk').onclick = () => go('settings');
+    m.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+    m.querySelector('[data-act="addword"]').onclick = () => wordModal(null);
+    m.querySelector('[data-act="bulk"]').onclick = bulkModal;
+    m.querySelector('[data-act="adduser"]').onclick = () => userModal(null);
+  }
+  function kpi(em, bg, n, label) { return '<div class="kpi"><div class="ic" style="background:' + bg + '">' + em + '</div><div><b>' + n + '</b><span>' + label + '</span></div></div>'; }
+  function recentList(list) {
+    if (!list.length) return '<div class="empty"><span class="em">🌱</span>עוד אין מפגשים. אחרי משחק ראשון התוצאות יופיעו כאן.</div>';
+    return '<div class="recent">' + list.map(x => {
+      const p = sessPct(x);
+      return '<div class="r"><span class="em">' + sessEm(x) + '</span><div class="t"><b>' + esc(x.patient || 'ללא שם') + ' · ' + esc(sessName(x)) + '</b><span>' + DIB.fmtDate(x.t) + ' · ' + esc(x.userName) + '</span></div>' +
+        (p == null ? '<span class="pct small">' + esc(sessShort(x)) + '</span>' : '<span class="pct ' + pctCls(p) + '">' + Math.round(p * 100) + '%</span>') + '</div>';
+    }).join('') + '</div>';
+  }
+
+  /* ================= משחקים ================= */
+  function games(m) {
+    const list = DIB.games({ includeDisabled: true });
+    m.innerHTML = head('משחקים', 'הדלקה וכיבוי של משחקים, והגדרות ברירת המחדל שלהם. משתמשים יכולים לשנות לעצמם בתוך המשחק.') +
+      '<div class="glist">' + list.map(g => {
+        const d = DIB.gameSettings(g.id);
+        return '<div class="gitem" data-g="' + g.id + '"><div class="art" style="background:' + g.color + '22">' + g.emoji + '</div>' +
+          '<div><h3>' + esc(g.name) + ' ' + (g.enabled ? '<span class="chip mint">פעיל</span>' : '<span class="chip gray">כבוי</span>') + '</h3><p>' + esc(g.desc) + '</p>' +
+          '<p style="margin-top:8px"><a href="' + g.url + '" target="_blank">פתיחת המשחק ↗</a></p></div>' +
+          '<label class="switch" title="פעיל"><input type="checkbox" data-en' + (g.enabled ? ' checked' : '') + '><i></i></label>' +
+          (g.id === 'vocab' ? '<div class="defs">' +
+            selField('מצב פתיחה', 'mode', d.mode, Object.keys(MODE_NAMES).map(k => [k, MODE_NAMES[k]])) +
+            selField('תמונות במסך', 'choices', d.choices, [2, 3, 4, 6].map(v => [v, v])) +
+            selField('זוגות במשחק זוגות', 'pairs', d.pairs, [3, 4, 6, 8].map(v => [v, v])) +
+            selField('סבבים', 'rounds', d.rounds, [5, 10, 15, 20].map(v => [v, v])) +
+            selField('רמת מילים', 'maxLevel', d.maxLevel, [[1, 'בסיסי'], [2, 'בינוני'], [3, 'הכל']]) +
+            '<label class="toggle check" style="align-self:end"><input type="checkbox" data-d="showText"' + (d.showText ? ' checked' : '') + '> הצגת המילה מתחת לתמונה</label>' +
+            '<label class="toggle check" style="align-self:end"><input type="checkbox" data-d="autoSpeak"' + (d.autoSpeak ? ' checked' : '') + '> הקראה אוטומטית</label>' +
+            '</div>' : '') +
+          '</div>';
+      }).join('') + '</div>';
+    m.querySelectorAll('.gitem').forEach(el => {
+      const id = el.dataset.g;
+      el.querySelector('[data-en]').onchange = e => { DIB.setGame(id, { enabled: e.target.checked }); DIB.toast(e.target.checked ? 'המשחק הופעל' : 'המשחק כובה', 'ok'); refresh(); };
+      el.querySelectorAll('[data-d]').forEach(inp => inp.onchange = () => {
+        const cur = Object.assign({}, (DIB.get().games[id] || {}).defaults || {});
+        const k = inp.dataset.d;
+        cur[k] = inp.type === 'checkbox' ? inp.checked : (isNaN(inp.value) ? inp.value : Number(inp.value));
+        DIB.setGame(id, { defaults: cur });
+        DIB.toast('נשמר', 'ok');
+      });
+    });
+  }
+  function selField(label, k, v, opts) {
+    return '<label><span class="opt-label">' + label + '</span><select class="input" data-d="' + k + '">' + opts.map(o => '<option value="' + o[0] + '"' + (String(o[0]) === String(v) ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select></label>';
+  }
+
+  /* ================= מאגר מילים ================= */
+  function words(m) {
+    const cats = DIB.categories({ includeHidden: true });
+    m.innerHTML = head('מאגר מילים', 'לוחצים על מילה כדי לערוך, להחליף תמונה או להסתיר. מילים מוסתרות לא מופיעות במשחקים.',
+      '<button class="btn btn-outline" id="exp">⬇️ ייצוא לאקסל</button><button class="btn btn-outline" id="bulk">📋 הוספה מרובה</button><button class="btn btn-primary" id="add">➕ מילה חדשה</button>') +
+      '<div class="toolbar">' +
+      '<input class="input" id="q" type="search" placeholder="🔎 חיפוש מילה…" value="' + esc(ui.q) + '">' +
+      '<select class="input" id="cat"><option value="">כל הקטגוריות</option>' + cats.map(c => '<option value="' + c.id + '"' + (ui.cat === c.id ? ' selected' : '') + '>' + c.emoji + ' ' + esc(c.name) + '</option>').join('') + '</select>' +
+      '<div class="seg" id="flt">' + [['active', 'פעילות'], ['mine', 'שלכם'], ['hidden', 'מוסתרות'], ['all', 'הכל']].map(f => '<button data-f="' + f[0] + '" class="' + (ui.filter === f[0] ? 'on' : '') + '">' + f[1] + '</button>').join('') + '</div>' +
+      '</div><div class="result-count" id="rc"></div><div class="wgrid" id="wg"></div>';
+    const draw = () => {
+      let list = DIB.words({ includeHidden: true });
+      const s = DIB.get();
+      if (ui.cat) list = list.filter(w => w.cat === ui.cat);
+      if (ui.q) list = list.filter(w => w.word.includes(ui.q));
+      if (ui.filter === 'active') list = list.filter(w => !w.hidden);
+      if (ui.filter === 'hidden') list = list.filter(w => w.hidden);
+      if (ui.filter === 'mine') list = list.filter(w => w.custom || s.words.edits[w.id]);
+      m.querySelector('#rc').textContent = list.length + ' מילים';
+      const catMap = Object.fromEntries(cats.map(c => [c.id, c]));
+      m.querySelector('#wg').innerHTML = list.length ? list.map(w => {
+        const c = catMap[w.cat] || { name: '?', emoji: '' };
+        const edited = !w.custom && s.words.edits[w.id] && Object.keys(s.words.edits[w.id]).some(k => k !== 'hidden');
+        return '<div class="wcard' + (w.hidden ? ' off' : '') + '" tabindex="0" data-id="' + esc(w.id) + '">' +
+          (w.custom ? '<span class="chip coral badge">חדש</span>' : edited ? '<span class="chip sun badge">נערך</span>' : '') +
+          '<span class="quick"><button class="btn btn-icon btn-sm btn-outline" data-hide title="' + (w.hidden ? 'החזרה' : 'הסתרה') + '">' + (w.hidden ? '👁️' : '🙈') + '</button></span>' +
+          DIB.pic(w) + '<span class="w">' + esc(w.word) + '</span>' +
+          '<span class="meta"><span class="chip gray">' + c.emoji + ' ' + esc(c.name) + '</span><span class="chip">' + ['', 'בסיסי', 'בינוני', 'מתקדם'][w.level || 1] + '</span></span></div>';
+      }).join('') : '<div class="empty" style="grid-column:1/-1"><span class="em">🔎</span>לא נמצאו מילים</div>';
+      m.querySelectorAll('.wcard').forEach(el => {
+        const w = list.find(x => x.id === el.dataset.id);
+        el.onclick = e => { if (e.target.closest('[data-hide]')) return; wordModal(w); };
+        el.onkeydown = e => { if (e.key === 'Enter') wordModal(w); };
+        el.querySelector('[data-hide]').onclick = () => { DIB.setWordHidden(w.id, !w.hidden); DIB.toast(w.hidden ? 'המילה חזרה למשחקים' : 'המילה הוסתרה', 'ok'); draw(); };
+      });
+    };
+    m.querySelector('#q').oninput = e => { ui.q = e.target.value.trim(); draw(); };
+    m.querySelector('#cat').onchange = e => { ui.cat = e.target.value; draw(); };
+    m.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { ui.filter = b.dataset.f; m.querySelectorAll('[data-f]').forEach(x => x.classList.toggle('on', x === b)); draw(); });
+    m.querySelector('#add').onclick = () => wordModal(null);
+    m.querySelector('#bulk').onclick = bulkModal;
+    m.querySelector('#exp').onclick = () => {
+      const catMap = Object.fromEntries(cats.map(c => [c.id, c.name]));
+      const rows = [['מילה', 'קטגוריה', 'אימוג׳י', 'רמה', 'מוסתרת', 'מקור']].concat(
+        DIB.words({ includeHidden: true }).map(w => [w.word, catMap[w.cat] || w.cat, w.emoji || '', w.level || 1, w.hidden ? 'כן' : '', w.custom ? 'נוספה' : 'מובנית']));
+      csv('מאגר-מילים.csv', rows);
+    };
+    draw();
+  }
+
+  const QUICK_EMOJI = ['🐶', '🍎', '🚗', '🏠', '⚽', '👕', '🌳', '☀️', '😀', '✋', '📚', '🎵', '🔨', '🍕', '🧸', '⭐'];
+
+  function wordModal(w) {
+    const cats = DIB.categories({ includeHidden: true });
+    const isNew = !w;
+    const s = DIB.get();
+    w = Object.assign({ word: '', emoji: '', img: '', cat: ui.cat || (cats[0] && cats[0].id), level: 1 }, w || {});
+    const edited = !isNew && !w.custom && s.words.edits[w.id];
+    const d = modal(
+      '<div class="modal-head"><h2>' + (isNew ? 'מילה חדשה' : 'עריכת מילה') + '</h2><button class="btn btn-ghost btn-icon" data-close aria-label="סגירה">✕</button></div>' +
+      '<form id="wf">' +
+      '<label class="field"><span>המילה</span><input class="input" name="word" required value="' + esc(w.word) + '" placeholder="למשל: מטוס"></label>' +
+      '<label class="field"><span>קטגוריה</span><select class="input" name="cat">' + cats.map(c => '<option value="' + c.id + '"' + (c.id === w.cat ? ' selected' : '') + '>' + c.emoji + ' ' + esc(c.name) + '</option>').join('') + '</select></label>' +
+      '<div class="field"><span>תמונה</span><div class="emoji-row"><div class="emoji-prev" id="prev"></div><div style="flex:1;display:grid;gap:8px">' +
+      '<input class="input" name="emoji" value="' + esc(w.emoji) + '" placeholder="אימוג׳י (מדביקים או בוחרים)" style="font-family:var(--emoji),var(--font)">' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap"><label class="btn btn-outline btn-sm">📷 העלאת תמונה<input type="file" accept="image/*" id="file" hidden></label><button type="button" class="btn btn-ghost btn-sm" id="rmimg"' + (w.img ? '' : ' hidden') + '>הסרת התמונה</button></div>' +
+      '</div></div><div class="emoji-quick">' + QUICK_EMOJI.map(e => '<button type="button" data-e="' + e + '">' + e + '</button>').join('') + '</div>' +
+      '<span class="muted small" style="font-weight:400">תמונה שמעלים מחליפה את האימוג׳י. אפשר צילום, ציור או תמונה מהאינטרנט.</span></div>' +
+      '<div class="field"><span>רמה</span><div class="seg" id="lvl">' + [[1, 'בסיסי'], [2, 'בינוני'], [3, 'מתקדם']].map(l => '<button type="button" data-l="' + l[0] + '" class="' + ((w.level || 1) === l[0] ? 'on' : '') + '">' + l[1] + '</button>').join('') + '</div></div>' +
+      '<div class="modal-foot"><button class="btn btn-primary">שמירה</button>' +
+      (!isNew ? '<button type="button" class="btn btn-outline" id="tts">🔊 השמעה</button>' : '') +
+      (edited ? '<button type="button" class="btn btn-ghost" id="reset">↺ החזרה למקור</button>' : '') +
+      (!isNew ? '<button type="button" class="btn btn-danger" id="del" style="margin-inline-start:auto">' + (w.custom ? '🗑️ מחיקה' : (w.hidden ? '👁️ החזרה למשחקים' : '🙈 הסתרה')) + '</button>' : '') +
+      '</div></form>');
+    const f = d.querySelector('#wf');
+    let img = w.img || '', level = w.level || 1;
+    const prev = () => { d.querySelector('#prev').innerHTML = DIB.pic({ word: f.word.value, emoji: f.emoji.value || '❓', img }); d.querySelector('#rmimg').hidden = !img; };
+    prev();
+    f.emoji.oninput = prev;
+    d.querySelectorAll('[data-e]').forEach(b => b.onclick = () => { f.emoji.value = b.dataset.e; prev(); });
+    d.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { level = Number(b.dataset.l); d.querySelectorAll('[data-l]').forEach(x => x.classList.toggle('on', x === b)); });
+    d.querySelector('#file').onchange = async e => {
+      const file = e.target.files[0]; if (!file) return;
+      try { img = await DIB.resizeImage(file, 320); prev(); } catch (err) { DIB.toast('לא הצלחנו לקרוא את התמונה', 'error'); }
+    };
+    d.querySelector('#rmimg').onclick = () => { img = ''; prev(); };
+    const t = d.querySelector('#tts'); if (t) t.onclick = () => DIB.speak(f.word.value);
+    const r = d.querySelector('#reset'); if (r) r.onclick = () => { DIB.resetWord(w.id); d.close(); DIB.toast('המילה חזרה למקור', 'ok'); refresh(); };
+    const del = d.querySelector('#del'); if (del) del.onclick = () => {
+      if (w.custom) { if (!confirm('למחוק את "' + w.word + '"?')) return; DIB.deleteWord(w.id); DIB.toast('נמחקה', 'ok'); }
+      else { DIB.setWordHidden(w.id, !w.hidden); DIB.toast(w.hidden ? 'המילה חזרה' : 'המילה הוסתרה', 'ok'); }
+      d.close(); refresh();
+    };
+    f.onsubmit = e => {
+      e.preventDefault();
+      const word = f.word.value.trim();
+      if (!word) return;
+      if (!img && !f.emoji.value.trim()) { DIB.toast('צריך אימוג׳י או תמונה', 'error'); return; }
+      const dup = isNew && DIB.words({ includeHidden: true }).find(x => x.word === word && x.cat === f.cat.value);
+      if (dup && !confirm('המילה "' + word + '" כבר קיימת בקטגוריה הזו. להוסיף בכל זאת?')) return;
+      DIB.saveWord({ id: isNew ? null : w.id, word, cat: f.cat.value, emoji: f.emoji.value.trim(), img, level });
+      d.close(); DIB.toast(isNew ? 'המילה נוספה' : 'נשמר', 'ok'); refresh();
+    };
+  }
+
+  function bulkModal() {
+    const cats = DIB.categories({ includeHidden: true });
+    const d = modal(
+      '<div class="modal-head"><h2>הוספת הרבה מילים</h2><button class="btn btn-ghost btn-icon" data-close aria-label="סגירה">✕</button></div>' +
+      '<p class="muted">שורה לכל מילה: <b>מילה, אימוג׳י, רמה</b>. הרמה לא חובה. אפשר להדביק גם מאקסל (שתי עמודות).</p>' +
+      '<label class="field"><span>לקטגוריה</span><select class="input" id="bc">' + cats.map(c => '<option value="' + c.id + '"' + (ui.cat === c.id ? ' selected' : '') + '>' + c.emoji + ' ' + esc(c.name) + '</option>').join('') + '</select></label>' +
+      '<label class="field"><span>המילים</span><textarea class="input" id="bt" placeholder="ג׳ירפה, 🦒&#10;קיפוד, 🦔, 2&#10;תוכי, 🦜" style="font-family:var(--emoji),var(--font)"></textarea></label>' +
+      '<p class="small muted" id="bp"></p>' +
+      '<div class="modal-foot"><button class="btn btn-primary" id="bgo">הוספה</button><button class="btn btn-ghost" data-close>ביטול</button></div>');
+    const ta = d.querySelector('#bt');
+    const parse = () => ta.value.split('\n').map(l => l.split(/[,\t]/).map(x => x.trim())).filter(p => p[0]).map(p => ({ word: p[0], emoji: p[1] || '', level: Number(p[2]) || 1 }));
+    ta.oninput = () => { const l = parse(); const noEm = l.filter(x => !x.emoji).length; d.querySelector('#bp').textContent = l.length + ' מילים' + (noEm ? ' · ל־' + noEm + ' אין אימוג׳י, יופיע ❓ עד שתוסיפו תמונה' : ''); };
+    d.querySelector('#bgo').onclick = () => {
+      const l = parse(); if (!l.length) return;
+      const cat = d.querySelector('#bc').value;
+      DIB.update(s => l.forEach(x => s.words.custom.push({ id: DIB.uid('w'), word: x.word, emoji: x.emoji || '❓', img: '', cat, level: x.level, created: Date.now() })));
+      d.close(); DIB.toast(l.length + ' מילים נוספו', 'ok'); refresh();
+    };
+  }
+
+  /* ================= קטגוריות ================= */
+  function cats(m) {
+    const list = DIB.categories({ includeHidden: true });
+    const counts = {};
+    DIB.words().forEach(w => counts[w.cat] = (counts[w.cat] || 0) + 1);
+    m.innerHTML = head('קטגוריות', 'נושאים שמהם בוחרים במשחקים. קטגוריה מוסתרת מסתירה את כל המילים שבה.', '<button class="btn btn-primary" id="add">➕ קטגוריה חדשה</button>') +
+      '<div class="clist">' + list.map(c => '<div class="citem' + (c.hidden ? ' off' : '') + '" style="--c:' + c.color + '"><span class="em">' + c.emoji + '</span><div class="nm"><b>' + esc(c.name) + '</b><span class="muted small">' + (counts[c.id] || 0) + ' מילים פעילות' + (c.custom ? ' · שלכם' : '') + '</span></div>' +
+        '<button class="btn btn-ghost btn-icon btn-sm" data-edit="' + c.id + '" title="עריכה">✏️</button>' +
+        '<label class="switch" title="מופיעה במשחקים"><input type="checkbox" data-vis="' + c.id + '"' + (c.hidden ? '' : ' checked') + '><i></i></label></div>').join('') + '</div>';
+    m.querySelector('#add').onclick = () => catModal(null);
+    m.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => catModal(list.find(c => c.id === b.dataset.edit)));
+    m.querySelectorAll('[data-vis]').forEach(i => i.onchange = () => { DIB.setCategoryHidden(i.dataset.vis, !i.checked); refresh(); });
+  }
+  function catModal(c) {
+    const isNew = !c;
+    c = Object.assign({ name: '', emoji: '📁', color: '#5B5BD6' }, c || {});
+    const d = modal(
+      '<div class="modal-head"><h2>' + (isNew ? 'קטגוריה חדשה' : 'עריכת קטגוריה') + '</h2><button class="btn btn-ghost btn-icon" data-close aria-label="סגירה">✕</button></div>' +
+      '<form id="cf"><label class="field"><span>שם</span><input class="input" name="name" required value="' + esc(c.name) + '" placeholder="למשל: בגן"></label>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label class="field"><span>אימוג׳י</span><input class="input" name="emoji" value="' + esc(c.emoji) + '" style="font-family:var(--emoji),var(--font)"></label>' +
+      '<label class="field"><span>צבע</span><input class="input" type="color" name="color" value="' + esc(c.color) + '" style="padding:4px"></label></div>' +
+      '<div class="modal-foot"><button class="btn btn-primary">שמירה</button>' + (c.custom ? '<button type="button" class="btn btn-danger" id="del" style="margin-inline-start:auto">🗑️ מחיקה עם המילים שבה</button>' : '') + '</div></form>');
+    const f = d.querySelector('#cf');
+    f.onsubmit = e => { e.preventDefault(); DIB.saveCategory({ id: isNew ? null : c.id, name: f.name.value, emoji: f.emoji.value, color: f.color.value }); d.close(); DIB.toast('נשמר', 'ok'); refresh(); };
+    const del = d.querySelector('#del'); if (del) del.onclick = () => { if (!confirm('למחוק את הקטגוריה וכל המילים שהוספתם בה?')) return; DIB.deleteCategory(c.id); d.close(); refresh(); };
+  }
+
+  /* ================= מאגרים: חפץ ושימוש, משפטים, היגוי ================= */
+  const COLL = {
+    uses: {
+      title: 'חפץ ושימוש', sub: 'אוצר מילים למתקדמים: חפץ ומה עושים איתו. מופיע במסלול, בבועות ובזיכרון.',
+      label: x => esc(x.word), extra: x => '<span class="c2">' + esc(x.use) + '</span>',
+      chips: x => '<span class="chip">' + ['', 'בסיסי', 'בינוני', 'מתקדם'][x.level || 1] + '</span>',
+      blank: () => ({ word: '', use: '', emoji: '', img: '', level: 1 }),
+      fields: [['word', 'החפץ', 'למשל: מגהץ'], ['use', 'מה עושים איתו', 'למשל: מגהצים']], pic: true, level: true,
+      search: x => x.word + ' ' + x.use
+    },
+    sentences: {
+      title: 'משפטים', sub: 'משפטים פשוטים לתחביר. המאגר נבנה אוטומטית עם התאמה במין ובמספר, ואפשר להוסיף משפטים משלכם.',
+      label: x => esc(x.text), extra: () => '',
+      chips: x => '<span class="chip">' + ['', '2 מילים', '3 מילים', 'רבים'][x.level || 1] + '</span>',
+      blank: () => ({ text: '', pics: '', img: '', level: 2 }),
+      fields: [['text', 'המשפט', 'למשל: אבא שותה קפה'], ['pics', 'אימוג׳י לתמונה (אחד או כמה, עם רווח)', '👨 ☕']], level: true, levelNames: ['2 מילים', '3 מילים', 'רבים'],
+      search: x => x.text
+    },
+    artic: {
+      title: 'היגוי', sub: 'מילים לפי צליל ומיקום במילה. מופיעות במפלצת הרעבה, במסלול ובבועות.',
+      label: x => { const snd = DIB.sounds().find(t => t.id === x.sound) || { letters: '' }; return DIBC.hlText(x.word, hlFor(x.word, snd.letters, x.pos)); },
+      extra: () => '', chips: x => '<span class="chip coral">' + esc((DIB.sounds().find(t => t.id === x.sound) || {}).name || '') + '</span><span class="chip gray">' + DIB.POS[x.pos] + '</span>',
+      blank: () => ({ word: '', emoji: '', img: '', sound: ui.snd || 'r', pos: ui.pos || 'start' }),
+      fields: [['word', 'המילה', 'למשל: רכבת']], pic: true, artic: true,
+      search: x => x.word
+    }
+  };
+  function hlFor(word, letters, pos) {
+    const ch = [...word], idx = ch.map((x, i) => letters.includes(x) ? i : -1).filter(i => i >= 0);
+    if (!idx.length) return [];
+    const last = ch.length - 1;
+    if (pos === 'start') return [idx[0]];
+    if (pos === 'end') return [idx.includes(last) ? last : idx[idx.length - 1]];
+    const mm = idx.find(i => i > 0 && i < last); return [mm != null ? mm : idx[0]];
+  }
+
+  function collPage(m, coll) {
+    const C = COLL[coll];
+    const isArtic = coll === 'artic';
+    m.innerHTML = head(C.title, C.sub, '<button class="btn btn-outline" id="bulk">📋 הוספה מרובה</button><button class="btn btn-primary" id="add">➕ הוספה</button>') +
+      (isArtic ? '<div class="card" style="margin-bottom:16px"><h2>רשימות שמורות <button class="btn btn-outline btn-sm" id="newList">➕ רשימה חדשה</button></h2><div id="lists"></div></div>' : '') +
+      '<div class="toolbar"><input class="input" id="q" type="search" placeholder="🔎 חיפוש…" value="' + esc(ui['q_' + coll] || '') + '">' +
+      (isArtic ? '<select class="input" id="snd"><option value="">כל הצלילים</option>' + DIB.sounds().map(x => '<option value="' + x.id + '"' + (ui.snd === x.id ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('') + '</select>' +
+        '<select class="input" id="pos"><option value="">כל המיקומים</option>' + Object.keys(DIB.POS).map(p => '<option value="' + p + '"' + (ui.pos === p ? ' selected' : '') + '>' + DIB.POS[p] + '</option>').join('') + '</select>' : '') +
+      '<div class="seg" id="flt">' + [['active', 'פעילים'], ['mine', 'שלכם'], ['hidden', 'מוסתרים']].map(f => '<button data-f="' + f[0] + '" class="' + ((ui['f_' + coll] || 'active') === f[0] ? 'on' : '') + '">' + f[1] + '</button>').join('') + '</div></div>' +
+      '<div class="result-count" id="rc"></div><div class="wgrid' + (coll === 'sentences' ? ' wide' : '') + '" id="wg"></div>';
+    const draw = () => {
+      const st = DIB.get();
+      const flt = ui['f_' + coll] || 'active', q = ui['q_' + coll] || '';
+      let list = DIB.items(coll, { includeHidden: true });
+      if (isArtic && ui.snd) list = list.filter(x => x.sound === ui.snd);
+      if (isArtic && ui.pos) list = list.filter(x => x.pos === ui.pos);
+      if (q) list = list.filter(x => C.search(x).includes(q));
+      if (flt === 'active') list = list.filter(x => !x.hidden);
+      if (flt === 'hidden') list = list.filter(x => x.hidden);
+      if (flt === 'mine') list = list.filter(x => x.custom || st[coll].edits[x.id]);
+      m.querySelector('#rc').textContent = list.length + ' פריטים' + (list.length > 400 ? ' · מוצגים 400 הראשונים, אפשר לחפש' : '');
+      m.querySelector('#wg').innerHTML = list.length ? list.slice(0, 400).map(x =>
+        '<div class="wcard' + (x.hidden ? ' off' : '') + '" tabindex="0" data-id="' + esc(x.id) + '">' +
+        (x.custom ? '<span class="chip coral badge">חדש</span>' : '') +
+        '<span class="quick"><button class="btn btn-icon btn-sm btn-outline" data-hide title="' + (x.hidden ? 'החזרה' : 'הסתרה') + '">' + (x.hidden ? '👁️' : '🙈') + '</button></span>' +
+        DIB.pic(x) + '<span class="w">' + C.label(x) + '</span>' + C.extra(x) + '<span class="meta">' + C.chips(x) + '</span></div>').join('')
+        : '<div class="empty" style="grid-column:1/-1"><span class="em">🔎</span>אין פריטים כאן</div>';
+      m.querySelectorAll('.wcard').forEach(el => {
+        const x = list.find(y => y.id === el.dataset.id);
+        el.onclick = e => { if (e.target.closest('[data-hide]')) return; itemModal(coll, x); };
+        el.onkeydown = e => { if (e.key === 'Enter') itemModal(coll, x); };
+        el.querySelector('[data-hide]').onclick = () => { DIB.setItemHidden(coll, x.id, !x.hidden); DIB.toast(x.hidden ? 'הוחזר' : 'הוסתר', 'ok'); draw(); };
+      });
+    };
+    m.querySelector('#q').oninput = e => { ui['q_' + coll] = e.target.value.trim(); draw(); };
+    m.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { ui['f_' + coll] = b.dataset.f; m.querySelectorAll('[data-f]').forEach(y => y.classList.toggle('on', y === b)); draw(); });
+    if (isArtic) {
+      m.querySelector('#snd').onchange = e => { ui.snd = e.target.value; draw(); };
+      m.querySelector('#pos').onchange = e => { ui.pos = e.target.value; draw(); };
+      drawLists(m);
+      m.querySelector('#newList').onclick = () => listModal(null);
+    }
+    m.querySelector('#add').onclick = () => itemModal(coll, null);
+    m.querySelector('#bulk').onclick = () => collBulk(coll);
+    draw();
+  }
+
+  function drawLists(m) {
+    const ls = DIB.get().lists || [];
+    m.querySelector('#lists').innerHTML = ls.length ? '<div class="recent">' + ls.map(l => '<div class="r"><span class="em">📝</span><div class="t"><b>' + esc(l.name) + '</b><span>' + DIBC.parseList(l.text).length + ' מילים: ' + esc(DIBC.parseList(l.text).slice(0, 8).join(', ')) + '</span></div>' +
+      '<button class="btn btn-ghost btn-sm" data-share="' + l.id + '">📤 קישור</button><button class="btn btn-ghost btn-sm" data-edit-list="' + l.id + '">עריכה</button></div>').join('') + '</div>'
+      : '<p class="muted" style="margin:0">עוד אין רשימות. רשימה היא אוסף מילים שבחרתם למטופל/ת, למשל "מילים עם ר׳ לנועה". אפשר לשלוח אותה להורה בקישור.</p>';
+    m.querySelectorAll('[data-edit-list]').forEach(b => b.onclick = () => listModal(ls.find(l => l.id === b.dataset.editList)));
+    m.querySelectorAll('[data-share]').forEach(b => b.onclick = () => {
+      const l = ls.find(x => x.id === b.dataset.share);
+      const url = location.href.replace(/dashboard\.html.*$/, '') + 'games/monster.html?c=' + encodeURIComponent(JSON.stringify({ src: 'list', list: l.text, hl: l.hl, listName: l.name }));
+      const msg = 'תרגול היגוי בבית 👾\n' + l.name + '\n' + url;
+      (navigator.clipboard ? navigator.clipboard.writeText(msg) : Promise.reject()).then(() => DIB.toast('הקישור הועתק, אפשר להדביק בוואטסאפ', 'ok'), () => prompt('העתיקו:', msg));
+    });
+  }
+
+  function listModal(l) {
+    const isNew = !l;
+    l = Object.assign({ name: '', text: '', hl: '' }, l || {});
+    const d = modal('<div class="modal-head"><h2>' + (isNew ? 'רשימה חדשה' : 'עריכת רשימה') + '</h2><button class="btn btn-ghost btn-icon" data-close aria-label="סגירה">✕</button></div>' +
+      '<form id="lf"><label class="field"><span>שם הרשימה</span><input class="input" name="name" required value="' + esc(l.name) + '" placeholder="למשל: ר׳ בסוף מילה · נועה"></label>' +
+      '<label class="field"><span>המילים (בפסיק או בשורה חדשה)</span><textarea class="input" name="text" required>' + esc(l.text) + '</textarea></label>' +
+      '<label class="field"><span>אותיות להדגשה (לא חובה)</span><input class="input" name="hl" value="' + esc(l.hl || '') + '" placeholder="ר"></label>' +
+      '<div class="modal-foot"><button class="btn btn-primary">שמירה</button>' + (!isNew ? '<button type="button" class="btn btn-danger" id="del" style="margin-inline-start:auto">🗑️ מחיקה</button>' : '') + '</div></form>');
+    const f = d.querySelector('#lf');
+    f.onsubmit = e => {
+      e.preventDefault();
+      DIB.update(s => {
+        s.lists = s.lists || [];
+        const rec = { name: f.name.value.trim(), text: f.text.value, hl: f.hl.value.trim() };
+        if (isNew) s.lists.push(Object.assign({ id: DIB.uid('l'), created: Date.now() }, rec)); else Object.assign(s.lists.find(x => x.id === l.id), rec);
+      });
+      d.close(); DIB.toast('נשמר', 'ok'); refresh();
+    };
+    const del = d.querySelector('#del'); if (del) del.onclick = () => { if (!confirm('למחוק את הרשימה?')) return; DIB.update(s => { s.lists = s.lists.filter(x => x.id !== l.id); }); d.close(); refresh(); };
+  }
+
+  function itemModal(coll, x) {
+    const C = COLL[coll];
+    const isNew = !x;
+    const st = DIB.get();
+    x = Object.assign(C.blank(), x || {});
+    const edited = !isNew && !x.custom && st[coll].edits[x.id];
+    const lvNames = C.levelNames || ['בסיסי', 'בינוני', 'מתקדם'];
+    const d = modal('<div class="modal-head"><h2>' + (isNew ? 'הוספה' : 'עריכה') + ' · ' + C.title + '</h2><button class="btn btn-ghost btn-icon" data-close aria-label="סגירה">✕</button></div>' +
+      '<form id="if">' + C.fields.map(fd => '<label class="field"><span>' + fd[1] + '</span><input class="input" name="' + fd[0] + '"' + (fd[0] === 'pics' ? ' style="font-family:var(--emoji),var(--font)"' : ' required') + ' value="' + esc(x[fd[0]] || '') + '" placeholder="' + esc(fd[2]) + '"></label>').join('') +
+      (C.artic ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label class="field"><span>צליל</span><select class="input" name="sound">' + DIB.sounds().map(t => '<option value="' + t.id + '"' + (x.sound === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') + '</select></label>' +
+        '<label class="field"><span>מיקום</span><select class="input" name="pos">' + Object.keys(DIB.POS).map(p => '<option value="' + p + '"' + (x.pos === p ? ' selected' : '') + '>' + DIB.POS[p] + '</option>').join('') + '</select></label></div>' : '') +
+      '<div class="field"><span>תמונה</span><div class="emoji-row"><div class="emoji-prev" id="prev"></div><div style="flex:1;display:grid;gap:8px">' +
+      (C.pic ? '<input class="input" name="emoji" value="' + esc(x.emoji || '') + '" placeholder="אימוג׳י (לא חובה)" style="font-family:var(--emoji),var(--font)">' : '') +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap"><label class="btn btn-outline btn-sm">📷 העלאת תמונה<input type="file" accept="image/*" id="file" hidden></label><button type="button" class="btn btn-ghost btn-sm" id="rmimg">הסרת התמונה</button></div>' +
+      '<span class="muted small">בלי תמונה ובלי אימוג׳י מוצגת האות הראשונה.</span></div></div></div>' +
+      (C.level ? '<div class="field"><span>רמה</span><div class="seg" id="lvl">' + [1, 2, 3].map(l => '<button type="button" data-l="' + l + '" class="' + ((x.level || 1) === l ? 'on' : '') + '">' + lvNames[l - 1] + '</button>').join('') + '</div></div>' : '') +
+      '<div class="modal-foot"><button class="btn btn-primary">שמירה</button>' +
+      '<button type="button" class="btn btn-outline" id="tts">🔊 השמעה</button>' +
+      (edited ? '<button type="button" class="btn btn-ghost" id="reset">↺ החזרה למקור</button>' : '') +
+      (!isNew ? '<button type="button" class="btn btn-danger" id="del" style="margin-inline-start:auto">' + (x.custom ? '🗑️ מחיקה' : (x.hidden ? '👁️ החזרה' : '🙈 הסתרה')) + '</button>' : '') +
+      '</div></form>');
+    const f = d.querySelector('#if');
+    let img = x.img || '', level = x.level || 1;
+    const val = n => (f.elements[n] ? f.elements[n].value : '');
+    const cur = () => { const c = { word: val('word'), text: val('text'), emoji: val('emoji'), img }; if (val('pics')) c.pics = val('pics'); return c; };
+    const prev = () => { d.querySelector('#prev').innerHTML = DIB.pic(cur()); d.querySelector('#rmimg').hidden = !img; };
+    prev();
+    f.querySelectorAll('input').forEach(i => i.addEventListener('input', prev));
+    d.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { level = Number(b.dataset.l); d.querySelectorAll('[data-l]').forEach(y => y.classList.toggle('on', y === b)); });
+    d.querySelector('#file').onchange = async e => { const file = e.target.files[0]; if (!file) return; try { img = await DIB.resizeImage(file, 320); prev(); } catch (err) { DIB.toast('לא הצלחנו לקרוא את התמונה', 'error'); } };
+    d.querySelector('#rmimg').onclick = () => { img = ''; prev(); };
+    d.querySelector('#tts').onclick = () => { const c = cur(); DIB.speak(coll === 'uses' ? c.word + '. ' + val('use') : c.text || c.word); };
+    const r = d.querySelector('#reset'); if (r) r.onclick = () => { DIB.resetItem(coll, x.id); d.close(); DIB.toast('הוחזר למקור', 'ok'); refresh(); };
+    const del = d.querySelector('#del'); if (del) del.onclick = () => {
+      if (x.custom) { if (!confirm('למחוק?')) return; DIB.deleteItem(coll, x.id); } else DIB.setItemHidden(coll, x.id, !x.hidden);
+      d.close(); refresh();
+    };
+    f.onsubmit = e => {
+      e.preventDefault();
+      const rec = { id: isNew ? null : x.id, img };
+      C.fields.forEach(fd => rec[fd[0]] = val(fd[0]).trim());
+      if (C.pic) rec.emoji = val('emoji').trim();
+      if (C.level) rec.level = level;
+      if (C.artic) { rec.sound = val('sound'); rec.pos = val('pos'); }
+      DIB.saveItem(coll, rec);
+      d.close(); DIB.toast('נשמר', 'ok'); refresh();
+    };
+  }
+
+  function collBulk(coll) {
+    const C = COLL[coll];
+    const help = coll === 'uses' ? 'שורה לכל חפץ: <b>חפץ, שימוש, אימוג׳י</b> (האימוג׳י לא חובה).' :
+      coll === 'sentences' ? 'שורה לכל משפט: <b>משפט, אימוג׳י</b> (האימוג׳י לא חובה).' : 'שורה לכל מילה: <b>מילה, אימוג׳י</b>. הצליל והמיקום נבחרים למטה.';
+    const d = modal('<div class="modal-head"><h2>הוספה מרובה · ' + C.title + '</h2><button class="btn btn-ghost btn-icon" data-close aria-label="סגירה">✕</button></div>' +
+      '<p class="muted">' + help + ' אפשר להדביק מאקסל.</p>' +
+      (coll === 'artic' ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label class="field"><span>צליל</span><select class="input" id="bs">' + DIB.sounds().map(t => '<option value="' + t.id + '"' + (ui.snd === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') + '</select></label>' +
+        '<label class="field"><span>מיקום</span><select class="input" id="bp">' + Object.keys(DIB.POS).map(p => '<option value="' + p + '"' + (ui.pos === p ? ' selected' : '') + '>' + DIB.POS[p] + '</option>').join('') + '</select></label></div>' : '') +
+      '<label class="field"><span>התוכן</span><textarea class="input" id="bt" style="font-family:var(--emoji),var(--font)"></textarea></label>' +
+      '<div class="modal-foot"><button class="btn btn-primary" id="bgo">הוספה</button><button class="btn btn-ghost" data-close>ביטול</button></div>');
+    d.querySelector('#bgo').onclick = () => {
+      const rows = d.querySelector('#bt').value.split('\n').map(l => l.split(/[,\t]/).map(y => y.trim())).filter(p => p[0]);
+      if (!rows.length) return;
+      DIB.update(s => rows.forEach(p => {
+        const base = { id: DIB.uid(coll[0]), created: Date.now(), img: '' };
+        if (coll === 'uses') s.uses.custom.push(Object.assign(base, { word: p[0], use: p[1] || '', emoji: p[2] || '', level: 2 }));
+        else if (coll === 'sentences') s.sentences.custom.push(Object.assign(base, { text: p[0], pics: p[1] || '', level: p[0].split(' ').length > 2 ? 2 : 1 }));
+        else s.artic.custom.push(Object.assign(base, { word: p[0], emoji: p[1] || '', sound: d.querySelector('#bs').value, pos: d.querySelector('#bp').value }));
+      }));
+      d.close(); DIB.toast(rows.length + ' נוספו', 'ok'); refresh();
+    };
+  }
+
+  /* ================= משתמשים ================= */
+  function users(m) {
+    const s = DIB.get();
+    const gl = DIB.games({ includeDisabled: true });
+    m.innerHTML = head('משתמשים וגישה', 'כל משתמש/ת מקבל/ת קוד אישי. קובעים כאן מי נכנס לאיזה משחק.', '<button class="btn btn-primary" id="add">➕ משתמש/ת חדש/ה</button>') +
+      '<div class="card" style="margin-bottom:16px;display:flex;align-items:center;gap:16px;justify-content:space-between;flex-wrap:wrap"><div><b>כניסה למשחקים רק עם קוד</b><p class="muted small" style="margin:2px 0 0">כשזה כבוי, כל מי שיש לו את הקישור יכול לשחק. הדשבורד תמיד דורש קוד מנהל.</p></div>' +
+      '<label class="switch"><input type="checkbox" id="req"' + (s.settings.requireLogin ? ' checked' : '') + '><i></i></label></div>' +
+      '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>שם</th><th>תפקיד</th><th>קוד</th><th>משחקים</th><th>כניסה אחרונה</th><th>פעיל</th><th></th></tr></thead><tbody>' +
+      s.users.map(u => '<tr><td><b>' + esc(u.name) + '</b>' + (u.notes ? '<div class="muted small">' + esc(u.notes) + '</div>' : '') + '</td>' +
+        '<td><span class="chip ' + (u.role === 'admin' ? '' : u.role === 'clinician' ? 'mint' : 'coral') + '">' + DIB.ROLES[u.role].name + '</span></td>' +
+        '<td><span class="code">' + esc(u.code) + '</span> <button class="btn btn-ghost btn-icon btn-sm" data-copy="' + u.id + '" title="העתקת הודעה עם הקוד">📋</button></td>' +
+        '<td class="small">' + (u.role === 'admin' || u.games === 'all' ? 'כל המשחקים' : (u.games || []).map(id => (gl.find(g => g.id === id) || {}).name || id).join(', ') || '<span class="muted">אין</span>') + '</td>' +
+        '<td class="small muted">' + (u.lastLogin ? DIB.fmtDate(u.lastLogin) : 'עוד לא') + '</td>' +
+        '<td><label class="switch"><input type="checkbox" data-act="' + u.id + '"' + (u.active ? ' checked' : '') + (u.id === me.id ? ' disabled' : '') + '><i></i></label></td>' +
+        '<td><button class="btn btn-ghost btn-sm" data-edit="' + u.id + '">עריכה</button></td></tr>').join('') +
+      '</tbody></table></div>' +
+      '<p class="muted small" style="margin-top:14px">💡 הקודים נשמרים כרגע בדפדפן הזה. אחרי החיבור למאגר משותף הם יעבדו מכל מכשיר.</p>';
+    m.querySelector('#add').onclick = () => userModal(null);
+    m.querySelector('#req').onchange = e => { DIB.update(s => { s.settings.requireLogin = e.target.checked; }); DIB.toast(e.target.checked ? 'מעכשיו נכנסים למשחקים עם קוד' : 'המשחקים פתוחים לכולם', 'ok'); };
+    m.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => userModal(s.users.find(u => u.id === b.dataset.edit)));
+    m.querySelectorAll('[data-act]').forEach(i => i.onchange = () => { DIB.update(s => { s.users.find(u => u.id === i.dataset.act).active = i.checked; }); refresh(); });
+    m.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => {
+      const u = s.users.find(x => x.id === b.dataset.copy);
+      const url = location.href.replace(/dashboard\.html.*$/, '');
+      const msg = 'שלום ' + u.name + ', הנה הכניסה שלך ל' + s.settings.siteName + ':\n' + url + '\nהקוד האישי שלך: ' + u.code;
+      (navigator.clipboard ? navigator.clipboard.writeText(msg) : Promise.reject()).then(() => DIB.toast('ההודעה הועתקה, אפשר להדביק בוואטסאפ', 'ok'), () => prompt('העתיקו את ההודעה:', msg));
+    });
+  }
+
+  function userModal(u) {
+    const s = DIB.get();
+    const isNew = !u;
+    const gl = DIB.games({ includeDisabled: true });
+    u = Object.assign({ name: '', role: 'parent', code: DIB.newCode(), games: gl.map(g => g.id), active: true, notes: '' }, u || {});
+    const all = u.games === 'all';
+    const d = modal(
+      '<div class="modal-head"><h2>' + (isNew ? 'משתמש/ת חדש/ה' : 'עריכת משתמש/ת') + '</h2><button class="btn btn-ghost btn-icon" data-close aria-label="סגירה">✕</button></div>' +
+      '<form id="uf"><label class="field"><span>שם</span><input class="input" name="name" required value="' + esc(u.name) + '" placeholder="למשל: ההורים של נועה"></label>' +
+      '<label class="field"><span>תפקיד</span><select class="input" name="role"' + (u.id === 'admin' ? ' disabled' : '') + '>' + Object.keys(DIB.ROLES).map(r => '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + DIB.ROLES[r].name + ' · ' + DIB.ROLES[r].desc + '</option>').join('') + '</select></label>' +
+      '<label class="field"><span>קוד אישי</span><div style="display:flex;gap:8px"><input class="input code-input" name="code" required minlength="4" maxlength="12" value="' + esc(u.code) + '" style="font-size:1.3rem;letter-spacing:.2em"><button type="button" class="btn btn-outline" id="regen" title="קוד חדש">🎲</button></div></label>' +
+      '<div class="field" id="gfield"><span>גישה למשחקים</span><div class="gamechecks"><label class="check"><input type="checkbox" id="gall"' + (all ? ' checked' : '') + '> כל המשחקים, כולל משחקים שיתווספו בעתיד</label>' +
+      gl.map(g => '<label class="check"><input type="checkbox" data-gid="' + g.id + '"' + (all || (u.games || []).includes(g.id) ? ' checked' : '') + (all ? ' disabled' : '') + '> ' + g.emoji + ' ' + esc(g.name) + '</label>').join('') + '</div></div>' +
+      '<label class="field"><span>הערות (לא חובה)</span><input class="input" name="notes" value="' + esc(u.notes || '') + '" placeholder="למשל: מטופלת של יום ג׳"></label>' +
+      '<div class="modal-foot"><button class="btn btn-primary">שמירה</button>' +
+      (!isNew && u.id !== 'admin' && u.id !== me.id ? '<button type="button" class="btn btn-danger" id="del" style="margin-inline-start:auto">🗑️ מחיקה</button>' : '') + '</div></form>');
+    const f = d.querySelector('#uf');
+    const gall = d.querySelector('#gall');
+    const syncRole = () => { d.querySelector('#gfield').style.display = f.role.value === 'admin' ? 'none' : ''; };
+    syncRole(); f.role.onchange = syncRole;
+    gall.onchange = () => d.querySelectorAll('[data-gid]').forEach(c => { c.disabled = gall.checked; if (gall.checked) c.checked = true; });
+    d.querySelector('#regen').onclick = () => { f.code.value = DIB.newCode(); };
+    const del = d.querySelector('#del'); if (del) del.onclick = () => { if (!confirm('למחוק את ' + u.name + '? הקוד יפסיק לעבוד.')) return; DIB.update(s => { s.users = s.users.filter(x => x.id !== u.id); }); d.close(); refresh(); };
+    f.onsubmit = e => {
+      e.preventDefault();
+      const code = f.code.value.trim();
+      if (s.users.some(x => x.code === code && x.id !== u.id)) { DIB.toast('הקוד הזה כבר בשימוש', 'error'); return; }
+      const rec = {
+        name: f.name.value.trim(), role: u.id === 'admin' ? 'admin' : f.role.value, code, notes: f.notes.value.trim(),
+        games: gall.checked ? 'all' : [...d.querySelectorAll('[data-gid]:checked')].map(c => c.dataset.gid)
+      };
+      DIB.update(s => {
+        if (isNew) s.users.push(Object.assign({ id: DIB.uid('u'), active: true, created: Date.now() }, rec));
+        else Object.assign(s.users.find(x => x.id === u.id), rec);
+      });
+      if (u.id === me.id) me = DIB.get().users.find(x => x.id === me.id);
+      d.close(); DIB.toast('נשמר', 'ok'); refresh();
+    };
+  }
+
+  /* ================= תוצאות ================= */
+  function results(m) {
+    const s = DIB.get();
+    const names = [...new Set(s.sessions.map(x => x.patient).filter(Boolean))].sort();
+    m.innerHTML = head('תוצאות ומעקב', 'כל מפגש נשמר כאן. בוחרים מטופל/ת כדי לראות התקדמות ומילים שקשות לו/לה.',
+      '<button class="btn btn-outline" id="exp">⬇️ ייצוא לאקסל</button>') +
+      '<div class="toolbar"><select class="input" id="rp"><option value="">כל המטופלים</option>' + names.map(n => '<option' + (ui.rq === n ? ' selected' : '') + '>' + esc(n) + '</option>').join('') + '</select>' +
+      '<select class="input" id="rm"><option value="">כל המשחקים</option>' + (window.DIB_GAMES || []).map(g => '<option value="' + g.id + '"' + (ui.rmode === g.id ? ' selected' : '') + '>' + g.emoji + ' ' + esc(g.name) + '</option>').join('') + '</select></div>' +
+      '<div id="rbody"></div>';
+    const draw = () => {
+      let list = s.sessions;
+      if (ui.rq) list = list.filter(x => x.patient === ui.rq);
+      if (ui.rmode) list = list.filter(x => (x.game || 'vocab') === ui.rmode);
+      const scored = list.filter(x => sessPct(x) != null && x.total);
+      const avg = scored.length ? scored.reduce((a, x) => a + x.correct / x.total, 0) / scored.length : null;
+      const missCount = {};
+      list.forEach(x => (x.missed || []).forEach(w => missCount[w] = (missCount[w] || 0) + 1));
+      const hard = Object.entries(missCount).sort((a, b) => b[1] - a[1]).slice(0, 15);
+      const totalWords = list.reduce((a, x) => a + (x.total || 0), 0);
+      m.querySelector('#rbody').innerHTML =
+        '<div class="kpis">' + kpi('🎯', 'var(--brand-soft)', list.length, 'מפגשים') + kpi('✅', 'var(--mint-soft)', avg == null ? '–' : Math.round(avg * 100) + '%', 'הצלחה ממוצעת בניסיון ראשון') +
+        kpi('🔤', 'var(--sun-soft)', totalWords, 'מילים וחזרות') + kpi('⏱️', 'var(--coral-soft)', Math.round(list.reduce((a, x) => a + (x.secs || 0), 0) / 60), 'דקות תרגול') + '</div>' +
+        (hard.length ? '<div class="card" style="margin-bottom:16px"><h2>מילים שכדאי לחזור עליהן</h2><div style="display:flex;flex-wrap:wrap;gap:8px">' + hard.map(h => '<span class="chip coral" style="font-size:.9rem">' + esc(h[0]) + ' · ' + h[1] + '</span>').join('') + '</div></div>' : '') +
+        (list.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th>מתי</th><th>מטופל/ת</th><th>משחק</th><th>תוצאה</th><th>בעזרה</th><th>מילים לתרגול</th><th>שיחק/ה עם</th><th></th></tr></thead><tbody>' +
+          list.slice(0, 300).map(x => {
+            const p = sessPct(x);
+            return '<tr><td class="small">' + DIB.fmtDate(x.t) + '</td><td><b>' + esc(x.patient || '–') + '</b></td>' +
+              '<td class="small">' + sessEm(x) + ' ' + esc(sessName(x)) + '</td>' +
+              '<td>' + (p == null ? esc(sessShort(x)) : '<span class="bar-mini"><i style="width:' + Math.round(p * 100) + '%"></i></span><span class="pct ' + pctCls(p) + '">' + x.correct + '/' + x.total + '</span>') + '</td>' +
+              '<td>' + (x.cued || 0) + '</td><td class="small">' + esc((x.missed || []).join(', ')) + '</td><td class="small muted">' + esc(x.userName) + '</td>' +
+              '<td><button class="btn btn-ghost btn-icon btn-sm" data-del="' + x.id + '" title="מחיקה">🗑️</button></td></tr>';
+          }).join('') + '</tbody></table></div>'
+          : '<div class="card empty"><span class="em">🌱</span>אין עדיין מפגשים' + (ui.rq || ui.rmode ? ' בסינון הזה' : '') + '.</div>');
+      m.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { if (!confirm('למחוק את המפגש?')) return; DIB.update(st => { st.sessions = st.sessions.filter(x => x.id !== b.dataset.del); }); refresh(); });
+    };
+    m.querySelector('#rp').onchange = e => { ui.rq = e.target.value; draw(); };
+    m.querySelector('#rm').onchange = e => { ui.rmode = e.target.value; draw(); };
+    m.querySelector('#exp').onclick = () => csv('תוצאות.csv', [['תאריך', 'מטופל/ת', 'משחק', 'נכון בניסיון ראשון', 'סה״כ', 'בעזרה', 'ניסיונות (זוגות)', 'שניות', 'מילים לתרגול', 'משתמש/ת']].concat(
+      s.sessions.map(x => [new Date(x.t).toLocaleString('he-IL'), x.patient || '', sessName(x), x.correct, x.total, x.cued || 0, x.moves || '', x.secs || '', (x.missed || []).join(' / '), x.userName])));
+    draw();
+  }
+
+  /* ================= הגדרות ================= */
+  function settings(m) {
+    const st = DIB.get().settings;
+    m.innerHTML = head('הגדרות וגיבוי', '') +
+      '<div class="two"><div class="card"><h2>האתר</h2>' +
+      '<label class="field"><span>שם האתר</span><input class="input" id="sn" value="' + esc(st.siteName) + '"></label>' +
+      '<label class="field"><span>משפט פתיחה בדף הבית</span><input class="input" id="tg" value="' + esc(st.tagline) + '"></label>' +
+      '<label class="field"><span>מהירות ההקראה: <b id="rv">' + st.voiceRate + '</b></span><input type="range" id="vr" min="0.5" max="1.3" step="0.05" value="' + st.voiceRate + '"></label>' +
+      '<div style="display:flex;gap:10px;align-items:center;margin-bottom:14px"><button class="btn btn-outline btn-sm" id="vt">🔊 בדיקת הקראה</button><span class="muted small" id="vinfo"></span></div>' +
+      '<label class="toggle check" style="margin-bottom:16px"><input type="checkbox" id="snd"' + (st.sounds ? ' checked' : '') + '> צלילי הצלחה וטעות</label>' +
+      '<button class="btn btn-primary" id="save">שמירה</button></div>' +
+      '<div class="card"><h2>גיבוי והעברה</h2><p class="muted">קובץ אחד עם הכל: מילים, תמונות, קטגוריות, משתמשים, הגדרות ותוצאות. אפשר לשמור אותו כגיבוי, או לטעון אותו במחשב אחר כדי להעביר את כל העבודה.</p>' +
+      '<div style="display:grid;gap:10px"><button class="btn btn-primary" id="ex">⬇️ הורדת קובץ גיבוי</button>' +
+      '<label class="btn btn-outline">⬆️ טעינת קובץ גיבוי<input type="file" accept=".json,application/json" id="im" hidden></label></div>' +
+      '<hr style="border:0;border-top:1px solid var(--line);margin:22px 0">' +
+      '<h2 style="color:var(--danger)">אזור מסוכן</h2><div style="display:grid;gap:10px">' +
+      '<button class="btn btn-danger" id="clrS">מחיקת כל התוצאות</button>' +
+      '<button class="btn btn-danger" id="rst">איפוס מלא של האתר</button></div></div></div>';
+    m.querySelector('#vr').oninput = e => { m.querySelector('#rv').textContent = e.target.value; };
+    m.querySelector('#vinfo').textContent = !DIB.canSpeak() ? 'אין תמיכה בהקראה בדפדפן הזה' : DIB.hasHebrewVoice() ? 'נמצא קול עברי ✓' : 'לא נמצא קול עברי בדפדפן הזה';
+    m.querySelector('#vt').onclick = () => DIB.speak('איפה הכלב? כל הכבוד!', { rate: Number(m.querySelector('#vr').value) });
+    m.querySelector('#save').onclick = () => {
+      DIB.update(s => Object.assign(s.settings, { siteName: m.querySelector('#sn').value.trim() || 'דיבוריקה', tagline: m.querySelector('#tg').value.trim(), voiceRate: Number(m.querySelector('#vr').value), sounds: m.querySelector('#snd').checked }));
+      DIB.toast('נשמר', 'ok'); refresh();
+    };
+    m.querySelector('#ex').onclick = () => DIB.download('גיבוי-' + st.siteName + '-' + new Date().toISOString().slice(0, 10) + '.json', DIB.exportAll());
+    m.querySelector('#im').onchange = e => {
+      const file = e.target.files[0]; if (!file) return;
+      if (!confirm('הטעינה תחליף את כל הנתונים בדפדפן הזה בנתונים מהקובץ. להמשיך?')) return;
+      file.text().then(t => { DIB.importAll(t); DIB.toast('הגיבוי נטען', 'ok'); me = DIB.currentUser() || me; refresh(); }).catch(err => DIB.toast(err.message || 'הקובץ לא תקין', 'error'));
+    };
+    m.querySelector('#clrS').onclick = () => { if (confirm('למחוק את כל התוצאות? אי אפשר לבטל.')) { DIB.update(s => { s.sessions = []; }); DIB.toast('נמחקו', 'ok'); refresh(); } };
+    m.querySelector('#rst').onclick = () => { if (confirm('איפוס מלא ימחק את כל המילים שהוספתם, המשתמשים והתוצאות. כדאי להוריד גיבוי קודם. להמשיך?')) { DIB.resetAll(); DIB.logout(); location.href = 'index.html'; } };
+  }
+
+  function csv(name, rows) {
+    const text = '﻿' + rows.map(r => r.map(v => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(',')).join('\n');
+    DIB.download(name, text, 'text/csv;charset=utf-8');
+  }
+
+  shell();
+})();
+</script>
+</body>
+</html>

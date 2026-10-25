@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>עולם המילים · דיבוריקה</title>
+<meta name="theme-color" content="#5B5BD6">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦁</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  body { background: radial-gradient(1200px 600px at 100% -10%, #E9E7FF 0, transparent 60%), radial-gradient(900px 500px at -10% 110%, #FFE6DC 0, transparent 60%), var(--bg); min-height: 100vh; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 18px; }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 66px; gap: 10px; }
+  .bar .title { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; text-decoration: none; color: var(--ink); }
+  .bar .title .em { font-family: var(--emoji); font-size: 1.7rem; }
+
+  /* ---------- מסך הגדרות ---------- */
+  .setup { padding: 8px 0 60px; }
+  .setup h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; margin: 10px 0 4px; }
+  .setup .sub { color: var(--muted); margin-bottom: 26px; }
+  .panel { background: var(--card); border-radius: 26px; box-shadow: var(--shadow); padding: 22px; margin-bottom: 18px; }
+  .panel h2 { font-size: 1.1rem; display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .panel h2 .n { width: 26px; height: 26px; border-radius: 9px; background: var(--brand-soft); color: var(--brand-ink); display: grid; place-items: center; font-size: .85rem; }
+  .modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mode { border: 2px solid var(--line); background: #fff; border-radius: 20px; padding: 16px 14px; text-align: right; cursor: pointer; display: grid; gap: 4px; transition: .15s; }
+  .mode:hover { border-color: color-mix(in srgb, var(--brand) 40%, var(--line)); }
+  .mode.on { border-color: var(--brand); background: var(--brand-soft); box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 12%, transparent); }
+  .mode .em { font-family: var(--emoji); font-size: 2rem; }
+  .mode b { font-size: 1.05rem; }
+  .mode span { color: var(--muted); font-size: .85rem; line-height: 1.4; }
+  @media (max-width: 820px) { .modes { grid-template-columns: 1fr 1fr; } }
+
+  .cats { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cat { display: inline-flex; align-items: center; gap: 6px; border: 2px solid var(--line); background: #fff; border-radius: 99px; padding: 6px 14px 6px 10px; cursor: pointer; font-weight: 600; transition: .15s; min-height: 42px; }
+  .cat .em { font-family: var(--emoji); font-size: 1.25rem; }
+  .cat small { color: var(--muted); font-weight: 500; }
+  .cat.on { border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, #fff); }
+  .cat.all { border-style: dashed; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px 24px; }
+  .opt-label { font-weight: 600; font-size: .9rem; color: var(--ink-2); margin-bottom: 8px; display: block; }
+  .toggles { display: grid; gap: 12px; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .start-row { position: sticky; bottom: 0; padding: 14px 0 18px; display: flex; gap: 14px; align-items: center; justify-content: space-between; background: linear-gradient(to top, var(--bg) 70%, transparent); flex-wrap: wrap; }
+  .avail { color: var(--muted); font-weight: 500; }
+  .avail b { color: var(--ink); }
+  .voice-warn { background: var(--sun-soft); color: #7A4D00; border-radius: 14px; padding: 10px 14px; font-size: .9rem; margin-top: 12px; }
+
+  /* ---------- מסך משחק ---------- */
+  .play { min-height: 100vh; display: flex; flex-direction: column; }
+  .play .bar { padding: 0 4px; }
+  .progress { flex: 1; height: 14px; border-radius: 99px; background: #fff; box-shadow: inset 0 1px 3px rgba(0,0,0,.08); overflow: hidden; max-width: 520px; }
+  .progress i { display: block; height: 100%; width: 0; border-radius: 99px; background: linear-gradient(90deg, var(--mint), #4ADE80); transition: width .4s ease; }
+  .score { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; background: #fff; padding: 6px 14px; border-radius: 99px; box-shadow: var(--shadow); }
+  .score .em { font-family: var(--emoji); }
+  .stagearea { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0 28px; gap: 22px; }
+  .prompt { display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 99px; padding: 10px 12px 10px 26px; box-shadow: var(--shadow-lg); font-size: clamp(1.4rem, 3.6vw, 2.2rem); font-weight: 800; animation: pop .35s ease; text-align: center; }
+  .speak-btn { width: 56px; height: 56px; border-radius: 50%; border: 0; background: var(--brand); color: #fff; font-size: 1.6rem; cursor: pointer; display: grid; place-items: center; flex: none; box-shadow: 0 8px 18px -8px var(--brand); font-family: var(--emoji); }
+  .speak-btn:active { transform: scale(.94); }
+  @keyframes pop { from { transform: scale(.9); opacity: 0; } }
+
+  .grid { display: grid; gap: clamp(10px, 2vw, 20px); width: 100%; max-width: 860px; }
+  .grid.n2 { grid-template-columns: repeat(2, 1fr); max-width: 620px; }
+  .grid.n3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.n4 { grid-template-columns: repeat(4, 1fr); }
+  .grid.n6 { grid-template-columns: repeat(3, 1fr); max-width: 760px; }
+  @media (max-width: 640px) { .grid.n4 { grid-template-columns: repeat(2, 1fr); max-width: 420px; } .grid.n3 { grid-template-columns: repeat(3, 1fr); } }
+  .tile { position: relative; aspect-ratio: 1; border: 0; border-radius: 28px; background: #fff; box-shadow: var(--shadow); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px; transition: transform .15s, box-shadow .2s, opacity .3s; animation: rise .4s both; }
+  .tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .tile .pic-emoji { font-size: clamp(3rem, 9vw, 5.4rem); }
+  .tile .pic-img { width: 72%; height: 64%; border-radius: 14px; }
+  .tile .lbl { font-weight: 700; font-size: clamp(.95rem, 2.2vw, 1.25rem); }
+  .tile.good { box-shadow: 0 0 0 5px var(--mint), var(--shadow-lg); animation: bounce .5s; }
+  .tile.good::after { content: '✓'; position: absolute; top: -10px; left: -10px; width: 40px; height: 40px; border-radius: 50%; background: var(--mint); color: #fff; font-weight: 900; display: grid; place-items: center; font-size: 1.3rem; animation: pop .3s; }
+  .tile.bad { animation: shake .35s; opacity: .35; pointer-events: none; }
+  .tile.dim { opacity: .3; }
+  @keyframes rise { from { transform: translateY(14px); opacity: 0; } }
+  @keyframes bounce { 30% { transform: scale(1.08); } 60% { transform: scale(.97); } }
+  .grid .tile:nth-child(2) { animation-delay: .05s; } .grid .tile:nth-child(3) { animation-delay: .1s; } .grid .tile:nth-child(4) { animation-delay: .15s; } .grid .tile:nth-child(5) { animation-delay: .2s; } .grid .tile:nth-child(6) { animation-delay: .25s; }
+
+  /* שיום */
+  .namecard { width: min(420px, 86vw); aspect-ratio: 1; background: #fff; border-radius: 40px; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; animation: pop .35s; position: relative; }
+  .namecard .pic-emoji { font-size: clamp(7rem, 22vw, 11rem); }
+  .namecard .pic-img { width: 70%; height: 70%; border-radius: 20px; }
+  .namecard .reveal { font-size: 2rem; font-weight: 800; min-height: 1.3em; }
+  .namecard .hint { position: absolute; top: 18px; right: 22px; color: var(--muted); font-weight: 600; }
+  .judge { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .judge .btn { min-width: 150px; }
+  .helpers { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+  /* זיכרון */
+  .memgrid { display: grid; gap: clamp(8px, 1.6vw, 14px); width: 100%; max-width: 760px; perspective: 900px; }
+  .mcard { aspect-ratio: 3/4; border: 0; padding: 0; background: transparent; cursor: pointer; position: relative; transform-style: preserve-3d; transition: transform .45s; border-radius: 20px; }
+  .mcard.flip, .mcard.done { transform: rotateY(180deg); }
+  .mcard .face { position: absolute; inset: 0; border-radius: 20px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; box-shadow: var(--shadow); }
+  .mcard .back { background: linear-gradient(140deg, var(--brand), #8B5CF6); color: #fff; font-size: 2rem; font-family: var(--emoji); }
+  .mcard .back::before { content: ''; position: absolute; inset: 8px; border-radius: 14px; border: 2px dashed rgba(255,255,255,.35); }
+  .mcard .front { background: #fff; transform: rotateY(180deg); }
+  .mcard .front .pic-emoji { font-size: clamp(2.2rem, 6vw, 3.6rem); }
+  .mcard .front .pic-img { width: 70%; height: 60%; }
+  .mcard .front .word { font-weight: 800; font-size: clamp(1rem, 2.6vw, 1.5rem); padding: 0 6px; text-align: center; }
+  .mcard.done .front { box-shadow: 0 0 0 4px var(--mint); }
+
+  /* סיכום */
+  .end { min-height: 100vh; display: grid; place-items: center; padding: 20px 0; }
+  .endcard { background: #fff; border-radius: 34px; box-shadow: var(--shadow-lg); padding: 34px 26px; text-align: center; width: min(560px, 100%); animation: pop .4s; }
+  .endcard .trophy { font-family: var(--emoji); font-size: 5rem; }
+  .stars { font-family: var(--emoji); font-size: 2.6rem; letter-spacing: 6px; margin: 4px 0 8px; }
+  .stars .off { filter: grayscale(1); opacity: .3; }
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+  .kpi { background: var(--bg-2); border-radius: 18px; padding: 12px 6px; }
+  .kpi b { display: block; font-size: 1.6rem; font-weight: 800; }
+  .kpi span { color: var(--muted); font-size: .85rem; }
+  .missed { text-align: right; background: var(--coral-soft); border-radius: 18px; padding: 14px 16px; margin-bottom: 18px; }
+  .missed h3 { font-size: 1rem; margin-bottom: 8px; }
+  .missed .list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .missed .list span { background: #fff; padding: 4px 10px; border-radius: 99px; font-weight: 600; font-size: .9rem; }
+  .missed .list .em { font-family: var(--emoji); }
+  .endbtns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="../data/words.js"></script>
+<script src="../data/games.js"></script>
+<script src="../assets/core.js"></script>
+<script>
+(async function () {
+  'use strict';
+  const GAME = 'vocab';
+  const app = document.getElementById('app');
+  const esc = DIB.esc;
+  const LAST_KEY = 'dibburika:vocab:last';
+  const PATIENTS_KEY = 'dibburika:patients';
+
+  try { await DIB.gate(GAME); } catch (e) { return; }
+
+  const MODES = [
+    { id: 'find', em: '🔍', name: 'איפה זה?', desc: 'שומעים מילה ובוחרים את התמונה. הבנת מילים.' },
+    { id: 'name', em: '🗣️', name: 'מה זה?', desc: 'רואים תמונה ואומרים את שמה. שיום.' },
+    { id: 'memory', em: '🃏', name: 'זוגות', desc: 'מוצאים תמונה ומילה שמתאימות. זיכרון וקריאה.' },
+    { id: 'odd', em: '🧩', name: 'מי לא שייך?', desc: '3 מאותה קטגוריה ואחד יוצא דופן. קטגוריזציה.' }
+  ];
+  const LEVELS = [{ v: 1, t: 'בסיסי' }, { v: 2, t: 'בינוני' }, { v: 3, t: 'הכל' }];
+
+  let cfg = Object.assign({}, DIB.gameSettings(GAME));
+  try { Object.assign(cfg, JSON.parse(localStorage.getItem(LAST_KEY) || '{}')); } catch (e) { /* ignore */ }
+  cfg.patient = cfg.patient || '';
+
+  function patients() { try { return JSON.parse(localStorage.getItem(PATIENTS_KEY) || '[]'); } catch (e) { return []; } }
+  function rememberPatient(n) {
+    if (!n) return;
+    const list = [n].concat(patients().filter(x => x !== n)).slice(0, 30);
+    try { localStorage.setItem(PATIENTS_KEY, JSON.stringify(list)); } catch (e) { /* ignore */ }
+  }
+  function persist() { try { localStorage.setItem(LAST_KEY, JSON.stringify(cfg)); } catch (e) { /* ignore */ } }
+
+  function pool() { return DIB.words({ cats: cfg.cats, maxLevel: cfg.maxLevel }); }
+
+  /* ================= מסך הגדרות ================= */
+  function setup() {
+    const cats = DIB.categories();
+    const counts = {};
+    DIB.words({ maxLevel: cfg.maxLevel }).forEach(w => counts[w.cat] = (counts[w.cat] || 0) + 1);
+    cfg.cats = (cfg.cats || []).filter(id => cats.some(c => c.id === id));
+    const n = pool().length;
+    const voiceOk = !DIB.canSpeak() ? 'none' : (DIB.hasHebrewVoice() ? 'ok' : 'maybe');
+    const choicesLabel = cfg.mode === 'memory' ? 'מספר זוגות' : 'מספר תמונות במסך';
+    const choiceVals = cfg.mode === 'memory' ? [3, 4, 6, 8] : [2, 3, 4, 6];
+    if (cfg.mode === 'memory' && !choiceVals.includes(cfg.pairs)) cfg.pairs = 6;
+    const curChoice = cfg.mode === 'memory' ? cfg.pairs : cfg.choices;
+
+    app.innerHTML =
+      '<div class="wrap">' +
+      '<div class="bar"><a class="title" href="../index.html"><span class="em">🦁</span>עולם המילים</a><a class="btn btn-ghost btn-sm" href="../index.html">→ לכל המשחקים</a></div>' +
+      '<div class="setup">' +
+      '<h1>מה משחקים היום?</h1><p class="sub">בוחרים סוג משחק, נושאים ורמה. ההגדרות נשמרות לפעם הבאה.</p>' +
+
+      '<div class="panel"><h2><span class="n">1</span>סוג המשחק</h2><div class="modes">' +
+      MODES.map(m => '<button class="mode' + (cfg.mode === m.id ? ' on' : '') + '" data-mode="' + m.id + '"><span class="em">' + m.em + '</span><b>' + m.name + '</b><span>' + m.desc + '</span></button>').join('') +
+      '</div></div>' +
+
+      '<div class="panel"><h2><span class="n">2</span>נושאים</h2><div class="cats">' +
+      '<button class="cat all' + (!cfg.cats.length ? ' on' : '') + '" style="--c:var(--brand)" data-cat="">✨ הכל</button>' +
+      cats.map(c => '<button class="cat' + (cfg.cats.includes(c.id) ? ' on' : '') + '" style="--c:' + c.color + '" data-cat="' + c.id + '"><span class="em">' + c.emoji + '</span>' + esc(c.name) + ' <small>' + (counts[c.id] || 0) + '</small></button>').join('') +
+      '</div></div>' +
+
+      '<div class="panel"><h2><span class="n">3</span>הגדרות</h2><div class="opts">' +
+      '<div><span class="opt-label">רמת מילים</span><div class="seg" data-k="maxLevel">' + LEVELS.map(l => '<button class="' + (cfg.maxLevel === l.v ? 'on' : '') + '" data-v="' + l.v + '">' + l.t + '</button>').join('') + '</div></div>' +
+      '<div><span class="opt-label">' + choicesLabel + '</span><div class="seg" data-k="' + (cfg.mode === 'memory' ? 'pairs' : 'choices') + '">' + choiceVals.map(v => '<button class="' + (curChoice === v ? 'on' : '') + '" data-v="' + v + '">' + v + '</button>').join('') + '</div></div>' +
+      (cfg.mode !== 'memory' ? '<div><span class="opt-label">מספר סבבים</span><div class="seg" data-k="rounds">' + [5, 10, 15, 20].map(v => '<button class="' + (cfg.rounds === v ? 'on' : '') + '" data-v="' + v + '">' + v + '</button>').join('') + '</div></div>' : '') +
+      '<div class="toggles">' +
+      '<label class="toggle"><span>הצגת המילה מתחת לתמונה</span><span class="switch"><input type="checkbox" data-t="showText"' + (cfg.showText ? ' checked' : '') + '><i></i></span></label>' +
+      '<label class="toggle"><span>הקראה אוטומטית</span><span class="switch"><input type="checkbox" data-t="autoSpeak"' + (cfg.autoSpeak ? ' checked' : '') + '><i></i></span></label>' +
+      '</div>' +
+      '<label class="field" style="margin:0"><span>שם המטופל/ת (לא חובה, לתיעוד ההתקדמות)</span><input class="input" id="patient" list="plist" value="' + esc(cfg.patient) + '" placeholder="למשל: נועה"><datalist id="plist">' + patients().map(p => '<option value="' + esc(p) + '">').join('') + '</datalist></label>' +
+      '</div>' +
+      (voiceOk === 'none' ? '<div class="voice-warn">🔇 הדפדפן הזה לא תומך בהקראה. המשחק יעבוד, אבל המילים לא יוקראו.</div>' :
+       voiceOk === 'maybe' ? '<div class="voice-warn">💡 לא מצאנו קול עברי בדפדפן. בכרום ובטלפונים ההקראה בדרך כלל עובדת טוב יותר.</div>' : '') +
+      '</div>' +
+
+      '<div class="start-row"><span class="avail"><b>' + n + '</b> מילים זמינות' + (n < 4 ? ' · צריך לפחות 4 מילים' : '') + '</span>' +
+      '<button class="btn btn-coral btn-lg" id="start"' + (n < 4 ? ' disabled' : '') + '>יאללה, מתחילים! ▶</button></div>' +
+      '</div></div>';
+
+    app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { cfg.mode = b.dataset.mode; persist(); setup(); });
+    app.querySelectorAll('[data-cat]').forEach(b => b.onclick = () => {
+      const id = b.dataset.cat;
+      if (!id) cfg.cats = [];
+      else cfg.cats = cfg.cats.includes(id) ? cfg.cats.filter(x => x !== id) : cfg.cats.concat(id);
+      persist(); setup();
+    });
+    app.querySelectorAll('.seg').forEach(seg => seg.querySelectorAll('button').forEach(b => b.onclick = () => { cfg[seg.dataset.k] = Number(b.dataset.v); persist(); setup(); }));
+    app.querySelectorAll('[data-t]').forEach(i => i.onchange = () => { cfg[i.dataset.t] = i.checked; persist(); });
+    app.querySelector('#patient').oninput = e => { cfg.patient = e.target.value.trim(); persist(); };
+    app.querySelector('#start').onclick = () => { rememberPatient(cfg.patient); start(); };
+  }
+
+  /* ================= עזרים ================= */
+  const VERB_CATS = new Set(['actions', 'feelings']);
+  function askText(w) {
+    if (VERB_CATS.has(w.cat)) return 'מי ' + w.word + '?';
+    if (/\s/.test(w.word)) return 'איפה ' + w.word + '?';
+    return 'איפה ה' + w.word + '?';
+  }
+  function distinct(list) {
+    const seenE = new Set(), seenW = new Set();
+    return list.filter(w => { const e = w.img || w.emoji; if (seenE.has(e) || seenW.has(w.word)) return false; seenE.add(e); seenW.add(w.word); return true; });
+  }
+  function pickDistractors(target, all, k) {
+    const others = DIB.shuffle(all.filter(w => w.id !== target.id && w.word !== target.word && (w.img || w.emoji) !== (target.img || target.emoji)));
+    return distinct(others).slice(0, k);
+  }
+  function stars(pct) { return pct >= 0.9 ? 3 : pct >= 0.6 ? 2 : pct > 0 ? 1 : 0; }
+
+  /* ================= ריצה ================= */
+  let run = null;
+
+  function start() {
+    const list = distinct(DIB.shuffle(pool()));
+    run = { mode: cfg.mode, t0: Date.now(), correct: 0, cued: 0, total: 0, missed: [], idx: 0 };
+    if (cfg.mode === 'memory') return memory(list);
+    if (cfg.mode === 'odd') return oddStart();
+    run.targets = list.slice(0, Math.min(cfg.rounds, list.length));
+    run.all = list;
+    run.rounds = run.targets.length;
+    shell();
+    next();
+  }
+
+  function shell() {
+    app.innerHTML =
+      '<div class="wrap play">' +
+      '<div class="bar"><button class="btn btn-outline btn-icon" id="quit" aria-label="יציאה">✕</button>' +
+      '<div class="progress" aria-hidden="true"><i id="prog"></i></div>' +
+      '<span class="score"><span class="em">⭐</span><span id="sc">0</span></span></div>' +
+      '<div class="stagearea" id="stage"></div></div>';
+    app.querySelector('#quit').onclick = () => { if (run.total === 0 || confirm('לצאת מהמשחק? התוצאות עד עכשיו יישמרו.')) finish(true); };
+  }
+  function setProgress() {
+    const p = app.querySelector('#prog'); if (p) p.style.width = (run.idx / run.rounds * 100) + '%';
+    const s = app.querySelector('#sc'); if (s) s.textContent = run.correct;
+  }
+
+  function next() {
+    setProgress();
+    if (run.idx >= run.rounds) return finish();
+    if (run.mode === 'find') return roundFind();
+    if (run.mode === 'name') return roundName();
+    if (run.mode === 'odd') return roundOdd();
+  }
+
+  /* ---------- איפה זה? ---------- */
+  function roundFind() {
+    const target = run.targets[run.idx];
+    const opts = DIB.shuffle([target].concat(pickDistractors(target, run.all, cfg.choices - 1)));
+    const stage = app.querySelector('#stage');
+    const q = askText(target);
+    let tries = 0, done = false;
+    stage.innerHTML =
+      '<div class="prompt"><button class="speak-btn" id="say" aria-label="השמעה חוזרת">🔊</button><span>' + esc(q) + '</span></div>' +
+      '<div class="grid n' + opts.length + '">' + opts.map((w, i) => '<button class="tile" data-i="' + i + '">' + DIB.pic(w) + (cfg.showText ? '<span class="lbl">' + esc(w.word) + '</span>' : '') + '</button>').join('') + '</div>';
+    const say = () => DIB.speak(q);
+    stage.querySelector('#say').onclick = say;
+    if (cfg.autoSpeak) setTimeout(say, 250);
+    stage.querySelectorAll('.tile').forEach(t => t.onclick = () => {
+      if (done) return;
+      const w = opts[Number(t.dataset.i)];
+      if (w.id === target.id) {
+        done = true;
+        t.classList.add('good');
+        stage.querySelectorAll('.tile').forEach(x => { if (x !== t) x.classList.add('dim'); });
+        DIB.sfx.good();
+        run.total++;
+        if (tries === 0) run.correct++; else { run.cued++; run.missed.push(target); }
+        setTimeout(() => DIB.speak(target.word), 150);
+        run.idx++;
+        setTimeout(next, 1300);
+      } else {
+        tries++;
+        t.classList.add('bad');
+        DIB.sfx.bad();
+        setTimeout(say, 400);
+      }
+    });
+  }
+
+  /* ---------- מה זה? ---------- */
+  function roundName() {
+    const target = run.targets[run.idx];
+    const stage = app.querySelector('#stage');
+    let shown = false;
+    stage.innerHTML =
+      '<div class="namecard"><span class="hint" id="hintTxt"></span>' + DIB.pic(target) + '<div class="reveal" id="reveal"></div></div>' +
+      '<div class="helpers">' +
+      '<button class="btn btn-outline" id="hint">💡 רמז: אות ראשונה</button>' +
+      '<button class="btn btn-outline" id="show">🔊 להשמיע את המילה</button>' +
+      '</div>' +
+      '<div class="judge">' +
+      '<button class="btn btn-mint btn-lg" data-j="ok">✓ אמר/ה לבד</button>' +
+      '<button class="btn btn-lg" style="background:var(--sun);color:#5A3A00" data-j="cue">✓ עם עזרה</button>' +
+      '<button class="btn btn-outline btn-lg" data-j="no">עוד לא</button>' +
+      '</div>';
+    const reveal = () => { shown = true; stage.querySelector('#reveal').textContent = target.word; DIB.speak(target.word); };
+    stage.querySelector('#hint').onclick = () => { stage.querySelector('#hintTxt').textContent = 'מתחיל ב־' + target.word.charAt(0); shown = true; };
+    stage.querySelector('#show').onclick = reveal;
+    stage.querySelectorAll('[data-j]').forEach(b => b.onclick = () => {
+      const j = b.dataset.j;
+      run.total++;
+      if (j === 'ok') { run.correct++; DIB.sfx.good(); }
+      else if (j === 'cue') { run.cued++; run.missed.push(target); DIB.sfx.tap(); }
+      else { run.missed.push(target); DIB.sfx.tap(); }
+      if (!shown) reveal();
+      stage.querySelectorAll('[data-j]').forEach(x => x.disabled = true);
+      run.idx++;
+      setTimeout(next, j === 'ok' ? 1000 : 1500);
+    });
+  }
+
+  /* ---------- מי לא שייך? ---------- */
+  function oddStart() {
+    const allCats = DIB.categories();
+    const byCat = {};
+    DIB.words({ maxLevel: cfg.maxLevel }).forEach(w => (byCat[w.cat] = byCat[w.cat] || []).push(w));
+    const groupCats = (cfg.cats.length ? cfg.cats : allCats.map(c => c.id)).filter(id => distinct(byCat[id] || []).length >= 3);
+    if (!groupCats.length) { DIB.toast('צריך לבחור נושא עם לפחות 3 מילים', 'error'); return setup(); }
+    run.byCat = byCat;
+    run.groupCats = groupCats;
+    run.rounds = cfg.rounds;
+    shell();
+    next();
+  }
+
+  function roundOdd() {
+    const catId = run.groupCats[Math.floor(Math.random() * run.groupCats.length)];
+    const cat = DIB.category(catId);
+    const group = distinct(DIB.shuffle(run.byCat[catId])).slice(0, 3);
+    const otherCats = Object.keys(run.byCat).filter(id => id !== catId && run.byCat[id].length);
+    const used = new Set(group.map(w => w.img || w.emoji));
+    const usedW = new Set(group.map(w => w.word));
+    const oddPool = DIB.shuffle(otherCats.flatMap(id => run.byCat[id])).filter(w => !used.has(w.img || w.emoji) && !usedW.has(w.word));
+    const odd = oddPool[0];
+    const opts = DIB.shuffle(group.concat(odd));
+    const stage = app.querySelector('#stage');
+    const q = 'מי לא שייך?';
+    let tries = 0, done = false;
+    stage.innerHTML =
+      '<div class="prompt"><button class="speak-btn" id="say" aria-label="השמעה חוזרת">🔊</button><span>' + q + '</span></div>' +
+      '<div class="grid n4">' + opts.map((w, i) => '<button class="tile" data-i="' + i + '">' + DIB.pic(w) + (cfg.showText ? '<span class="lbl">' + esc(w.word) + '</span>' : '') + '</button>').join('') + '</div>' +
+      '<p class="muted" id="why" style="min-height:1.6em;font-weight:600;font-size:1.1rem"></p>';
+    const say = () => DIB.speak(q);
+    stage.querySelector('#say').onclick = say;
+    if (cfg.autoSpeak) setTimeout(say, 250);
+    stage.querySelectorAll('.tile').forEach(t => t.onclick = () => {
+      if (done) return;
+      const w = opts[Number(t.dataset.i)];
+      if (w === odd) {
+        done = true;
+        t.classList.add('good');
+        DIB.sfx.good();
+        run.total++;
+        if (tries === 0) run.correct++; else { run.cued++; run.missed.push(odd); }
+        const subj = (VERB_CATS.has(odd.cat) || /\s/.test(odd.word)) ? odd.word : 'ה' + odd.word;
+        const whyTxt = subj + ' לא שייך. כל השאר הם ' + cat.name + '.';
+        stage.querySelector('#why').textContent = whyTxt;
+        DIB.speak(whyTxt);
+        run.idx++;
+        setTimeout(next, 2600);
+      } else {
+        tries++;
+        t.classList.add('bad');
+        DIB.sfx.bad();
+      }
+    });
+  }
+
+  /* ---------- זוגות ---------- */
+  function memory(list) {
+    const pairs = Math.min(cfg.pairs || 6, list.length);
+    const chosen = list.slice(0, pairs);
+    const cards = DIB.shuffle(chosen.flatMap(w => [{ w, kind: 'pic' }, { w, kind: cfg.showText ? 'word' : 'pic' }]));
+    run.rounds = pairs; run.moves = 0;
+    const cols = pairs <= 3 ? 3 : pairs <= 4 ? 4 : pairs <= 6 ? 4 : 4;
+    app.innerHTML =
+      '<div class="wrap play">' +
+      '<div class="bar"><button class="btn btn-outline btn-icon" id="quit" aria-label="יציאה">✕</button>' +
+      '<div class="progress"><i id="prog"></i></div>' +
+      '<span class="score"><span class="em">👆</span><span id="mv">0</span></span></div>' +
+      '<div class="stagearea"><div class="memgrid" style="grid-template-columns:repeat(' + cols + ',1fr);max-width:' + (cols * 150) + 'px">' +
+      cards.map((c, i) => '<button class="mcard" data-i="' + i + '" aria-label="קלף"><span class="face back">💬</span><span class="face front">' +
+        (c.kind === 'pic' ? DIB.pic(c.w) : '<span class="word">' + esc(c.w.word) + '</span>') + '</span></button>').join('') +
+      '</div></div></div>';
+    app.querySelector('#quit').onclick = () => { if (confirm('לצאת מהמשחק?')) finish(true); };
+    let open = [], lock = false;
+    app.querySelectorAll('.mcard').forEach(el => el.onclick = () => {
+      if (lock || el.classList.contains('flip') || el.classList.contains('done')) return;
+      const c = cards[Number(el.dataset.i)];
+      el.classList.add('flip'); DIB.sfx.tap();
+      open.push({ el, c });
+      if (open.length < 2) return;
+      run.moves++; app.querySelector('#mv').textContent = run.moves;
+      const [a, b] = open; open = [];
+      if (a.c.w.id === b.c.w.id) {
+        a.el.classList.add('done'); b.el.classList.add('done');
+        DIB.sfx.good(); DIB.speak(a.c.w.word);
+        run.idx++; run.correct++; run.total++;
+        app.querySelector('#prog').style.width = (run.idx / run.rounds * 100) + '%';
+        if (run.idx === run.rounds) setTimeout(finish, 900);
+      } else {
+        lock = true;
+        setTimeout(() => { a.el.classList.remove('flip'); b.el.classList.remove('flip'); lock = false; }, 950);
+      }
+    });
+  }
+
+  /* ---------- סיכום ---------- */
+  function finish(early) {
+    const secs = Math.round((Date.now() - run.t0) / 1000);
+    let pct;
+    if (run.mode === 'memory') pct = run.total ? (run.correct / run.rounds) * Math.min(1, (run.rounds * 1.5) / Math.max(run.moves, 1)) : 0;
+    else pct = run.total ? run.correct / run.total : 0;
+    const st = stars(pct);
+    if (run.total > 0) {
+      DIB.logSession({
+        game: GAME, mode: run.mode, patient: cfg.patient || '', total: run.total, correct: run.correct, cued: run.cued,
+        moves: run.moves || null, missed: run.missed.map(w => w.word), cats: cfg.cats.slice(), secs, early: !!early
+      });
+    }
+    if (early && run.total === 0) return setup();
+    if (st === 3) { DIB.sfx.win(); DIB.confetti(); } else if (st >= 1) DIB.sfx.win();
+    const msgs = ['כל ניסיון הוא התקדמות!', 'יפה מאוד!', 'כל הכבוד!', 'מדהים! אלופים!'];
+    const modeName = MODES.find(m => m.id === run.mode).name;
+    app.innerHTML =
+      '<div class="wrap end"><div class="endcard">' +
+      '<div class="trophy">' + ['🌱', '👍', '🏅', '🏆'][st] + '</div>' +
+      '<div class="stars">' + [1, 2, 3].map(i => '<span class="' + (i <= st ? '' : 'off') + '">⭐</span>').join('') + '</div>' +
+      '<h1>' + msgs[st] + '</h1>' +
+      '<p class="muted">' + esc(modeName) + (cfg.patient ? ' · ' + esc(cfg.patient) : '') + '</p>' +
+      '<div class="kpis">' +
+      (run.mode === 'memory'
+        ? '<div class="kpi"><b>' + run.correct + '</b><span>זוגות</span></div><div class="kpi"><b>' + run.moves + '</b><span>ניסיונות</span></div>'
+        : '<div class="kpi"><b>' + run.correct + '/' + run.total + '</b><span>בניסיון ראשון</span></div><div class="kpi"><b>' + run.cued + '</b><span>' + (run.mode === 'name' ? 'עם עזרה' : 'בניסיון נוסף') + '</span></div>') +
+      '<div class="kpi"><b>' + (secs >= 60 ? Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') : secs + '״') + '</b><span>זמן</span></div>' +
+      '</div>' +
+      (run.missed.length ? '<div class="missed"><h3>מילים לתרגל שוב</h3><div class="list">' + distinct(run.missed).map(w => '<span><span class="em">' + esc(w.emoji || '') + '</span> ' + esc(w.word) + '</span>').join('') + '</div></div>' : '') +
+      '<div class="endbtns"><button class="btn btn-coral btn-lg" id="again">↻ עוד סיבוב</button>' +
+      (run.missed.length ? '<button class="btn btn-outline btn-lg" id="retry">לתרגל את המילים האלה</button>' : '') +
+      '<button class="btn btn-outline btn-lg" id="settings">הגדרות</button></div>' +
+      '</div></div>';
+    if (cfg.autoSpeak) DIB.speak(msgs[st]);
+    app.querySelector('#again').onclick = start;
+    app.querySelector('#settings').onclick = setup;
+    const r = app.querySelector('#retry');
+    if (r) r.onclick = () => {
+      const missed = distinct(run.missed);
+      const mode = run.mode === 'odd' || run.mode === 'memory' ? 'find' : run.mode;
+      cfg.mode = mode;
+      run = { mode, t0: Date.now(), correct: 0, cued: 0, total: 0, missed: [], idx: 0, targets: DIB.shuffle(missed), all: distinct(DIB.shuffle(pool().length >= 6 ? pool() : DIB.words())) };
+      run.rounds = run.targets.length;
+      shell(); next();
+    };
+  }
+
+  setup();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>המפלצת הרעבה · דיבוריקה</title>
+<meta name="theme-color" content="#5B5BD6">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👾</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="stylesheet" href="../assets/game.css">
+<style>
+  .colors { display: flex; gap: 8px; }
+  .colors button { width: 46px; height: 46px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--line); cursor: pointer; }
+  .colors button.on { box-shadow: 0 0 0 3px var(--ink); }
+
+  body.playing { background: radial-gradient(circle at 50% 120%, color-mix(in srgb, var(--mc) 35%, #fff) 0, transparent 60%), linear-gradient(180deg, #FFF7EC, #F3EEFF); }
+  .arena { flex: 1; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 20px; padding: 6px 0 24px; }
+  @media (max-width: 760px) {
+    .arena { grid-template-columns: 1fr; gap: 4px; align-content: start; }
+    .mon-wrap { order: -1; }
+    .mon-wrap .monster { width: 120px; }
+    .eaten-row { min-height: 0; }
+    .card { padding: 16px 14px; gap: 10px; border-radius: 28px; }
+    .card .c-pic { font-size: 5rem; }
+    .card .c-text { font-size: 2.3rem; }
+    .judge .btn-lg { min-height: 48px; padding: .5em 1.1em; font-size: 1rem; }
+    .speech { top: 10px; right: 18%; }
+  }
+  .card { background: #fff; border-radius: 36px; box-shadow: var(--shadow-lg); padding: 24px 22px; text-align: center; display: grid; gap: 14px; justify-items: center; transition: transform .6s cubic-bezier(.5, -0.3, .7, .5), opacity .5s; }
+  .card.in { animation: pop .45s cubic-bezier(.2, 1.4, .4, 1); }
+  .card.eaten { transform: translate(var(--tx), 60px) scale(.05) rotate(-30deg); opacity: 0; }
+  .card .c-pic { font-size: clamp(6rem, 18vw, 9rem); }
+  .card .c-pic .pic-img { width: 1.5em; height: 1.2em; }
+  .card .c-text { font-size: clamp(2.4rem, 7vw, 3.4rem); letter-spacing: .02em; }
+  .tools { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .tools .btn { font-size: 1rem; }
+  .rec.on { background: var(--danger); color: #fff; animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 10px #E5484D33; } }
+  .dots { display: flex; gap: 10px; justify-content: center; }
+  .dots i { width: 22px; height: 22px; border-radius: 50%; background: var(--line); transition: .25s; }
+  .dots i.ok { background: var(--mint); transform: scale(1.15); }
+  .dots i.cue { background: var(--sun); transform: scale(1.15); }
+  .dots i.no { background: var(--coral); transform: scale(1.15); }
+  .said { font-size: 1.5rem; padding: .7em 2.2em; }
+  .judge { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+  .mon-wrap { display: grid; justify-items: center; position: relative; }
+  .monster { width: min(340px, 70vw); height: auto; overflow: visible; animation: bob 2.6s ease-in-out infinite; transform-origin: 50% 100%; transition: transform .4s; }
+  @keyframes bob { 50% { transform: translateY(-8px) scaleY(1.02); } }
+  .monster .mouth-open { transform-origin: 100px 128px; transform: scaleY(.15); transition: transform .2s; }
+  .monster.open .mouth-open { transform: scaleY(1); }
+  .monster.chomp { animation: chomp .5s ease; }
+  @keyframes chomp { 30% { transform: scale(1.08, .92); } 60% { transform: scale(.96, 1.05); } }
+  .monster .pupil { transition: transform .3s; }
+  .monster.happy .eye-open { display: none; }
+  .monster .eye-happy { display: none; }
+  .monster.happy .eye-happy { display: block; }
+  .speech { position: absolute; top: 0; right: 8%; background: #fff; border-radius: 20px 20px 20px 4px; padding: 8px 16px; font-weight: 800; box-shadow: var(--shadow); opacity: 0; transform: scale(.6); transition: .25s; }
+  .speech.show { opacity: 1; transform: none; }
+  .food { position: fixed; z-index: 50; font-family: var(--emoji); font-size: 2.4rem; pointer-events: none; transition: left .55s cubic-bezier(.4, 0, .6, 1), top .55s cubic-bezier(.5, -0.6, .7, 1), transform .55s; }
+  .eaten-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; min-height: 32px; max-width: 100%; }
+  .eaten-row span { font-family: var(--emoji); font-size: 1.4rem; animation: pop .3s; }
+  .summary { width: 100%; border-collapse: collapse; margin-bottom: 18px; font-size: .95rem; }
+  .summary td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+  .summary .r { display: flex; gap: 4px; }
+  .summary .r i { width: 14px; height: 14px; border-radius: 50%; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="../data/words.js"></script>
+<script src="../data/uses.js"></script>
+<script src="../data/artic.js"></script>
+<script src="../data/games.js"></script>
+<script src="../assets/core.js"></script>
+<script src="../assets/content.js"></script>
+<script>
+(async function () {
+  'use strict';
+  const GAME = 'monster';
+  const app = document.getElementById('app');
+  const esc = DIB.esc;
+  try { await DIB.gate(GAME); } catch (e) { return; }
+
+  const COLORS = ['#7C6CF0', '#22B391', '#FF7A59', '#EC4899', '#38BDF8'];
+  const FOOD = ['🍪', '🍩', '🧁', '🍬', '🍓', '🍌', '🥕', '🍕', '🍭', '🍉'];
+  const canRec = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+
+  const setup = DIBC.setupScreen(app, {
+    game: GAME, title: 'המפלצת הרעבה', emoji: '👾',
+    intro: 'תרגול היגוי: אומרים את המילה, וכל חזרה מאכילה את המפלצת. בוחרים צליל ומיקום מהמאגר, או מקלידים רשימה משלכם.',
+    sources: ['artic', 'list', 'words'],
+    defaults: { src: 'artic', sound: 'r', pos: ['start'], count: 10, reps: 3, rate: 'self', rec: true, color: COLORS[0] },
+    options: cfg =>
+      DIBC.optSeg('כמה מילים', 'count', [[5, '5'], [10, '10'], [15, '15'], [0, 'כולן']], cfg.count) +
+      DIBC.optSeg('חזרות על כל מילה', 'reps', [1, 3, 5], cfg.reps) +
+      DIBC.optSeg('מי מסמן', 'rate', [['self', 'הילד/ה לבד'], ['adult', 'מבוגר מדרג']], cfg.rate) +
+      (canRec ? DIBC.optToggle('הקלטה כדי לשמוע את עצמי', 'rec', cfg.rec) : '') +
+      '<div><span class="opt-label">צבע המפלצת</span><div class="colors">' + COLORS.map(c => '<button class="' + (cfg.color === c ? 'on' : '') + '" data-color="' + c + '" style="background:' + c + '" aria-label="צבע"></button>').join('') + '</div></div>',
+    bindOptions: (root, cfg, redraw, persist) => root.querySelectorAll('[data-color]').forEach(b => b.onclick = () => { cfg.color = b.dataset.color; persist(); redraw(); }),
+    onStart: start
+  });
+
+  function monsterSVG(color) {
+    return '<svg class="monster" id="mon" viewBox="0 0 200 210" aria-hidden="true">' +
+      '<ellipse cx="100" cy="204" rx="64" ry="7" fill="#0001"/>' +
+      '<path d="M52 44 L44 8 L72 34 Z" fill="' + color + '"/><path d="M148 44 L156 8 L128 34 Z" fill="' + color + '"/>' +
+      '<path d="M100 26 C 160 26 186 70 186 122 C 186 172 150 200 100 200 C 50 200 14 172 14 122 C 14 70 40 26 100 26 Z" fill="' + color + '"/>' +
+      '<path d="M100 26 C 160 26 186 70 186 122 C 186 140 182 152 176 162 C 170 100 140 60 100 58 C 60 60 30 100 24 162 C 18 152 14 140 14 122 C 14 70 40 26 100 26 Z" fill="#fff" opacity=".12"/>' +
+      '<ellipse cx="100" cy="160" rx="48" ry="32" fill="#fff" opacity=".22"/>' +
+      '<ellipse cx="10" cy="128" rx="14" ry="22" fill="' + color + '" transform="rotate(-20 10 128)"/><ellipse cx="190" cy="128" rx="14" ry="22" fill="' + color + '" transform="rotate(20 190 128)"/>' +
+      '<g class="eye-open"><circle cx="72" cy="82" r="22" fill="#fff"/><circle cx="128" cy="82" r="22" fill="#fff"/>' +
+      '<g class="pupil"><circle cx="74" cy="86" r="10" fill="#1E2145"/><circle cx="130" cy="86" r="10" fill="#1E2145"/><circle cx="77" cy="82" r="3.5" fill="#fff"/><circle cx="133" cy="82" r="3.5" fill="#fff"/></g></g>' +
+      '<g class="eye-happy" fill="none" stroke="#1E2145" stroke-width="6" stroke-linecap="round"><path d="M56 86 Q72 66 88 86"/><path d="M112 86 Q128 66 144 86"/></g>' +
+      '<circle cx="50" cy="112" r="9" fill="#FF6B9A" opacity=".45"/><circle cx="150" cy="112" r="9" fill="#FF6B9A" opacity=".45"/>' +
+      '<g class="mouth-open"><path d="M62 118 Q100 176 138 118 Z" fill="#3B1033"/><path d="M78 150 Q100 166 122 150 Q100 140 78 150" fill="#FF6B9A"/>' +
+      '<path d="M70 118 L76 128 L82 118 Z M118 118 L124 128 L130 118 Z" fill="#fff"/></g>' +
+      '<path d="M62 118 Q100 128 138 118" fill="none" stroke="#3B1033" stroke-width="4" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+
+  let stream = null;
+  async function getStream() {
+    if (stream) return stream;
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    return stream;
+  }
+  function stopStream() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
+
+  function start(cfg, all) {
+    let list = DIB.shuffle(all);
+    if (cfg.count) list = list.slice(0, cfg.count);
+    const reps = cfg.reps;
+    const results = list.map(() => []);
+    let wi = 0, ri = 0, busy = false;
+    const t0 = Date.now();
+    document.body.classList.add('playing');
+    document.body.style.setProperty('--mc', cfg.color);
+
+    app.innerHTML = '<div class="wrap play"><div class="bar"><button class="btn btn-outline btn-icon" id="quit" aria-label="יציאה">✕</button>' +
+      '<div class="progress"><i id="prog"></i></div><span class="score"><span class="em">🍪</span><span id="sc">0</span></span></div>' +
+      '<div class="arena"><div id="cardBox"></div><div class="mon-wrap"><div class="speech" id="speech">יאמי!</div>' + monsterSVG(cfg.color) + '<div class="eaten-row" id="eaten"></div></div></div></div>';
+    const mon = app.querySelector('#mon');
+    app.querySelector('#quit').onclick = () => { if (!results.some(r => r.length) || confirm('לצאת מהמשחק?')) finish(true); };
+
+    function look(dx, dy) { mon.querySelector('.pupil').style.transform = 'translate(' + dx + 'px,' + dy + 'px)'; }
+    function say(txt) { const s = app.querySelector('#speech'); s.textContent = txt; s.classList.add('show'); setTimeout(() => s.classList.remove('show'), 1100); }
+
+    function showWord() {
+      const c = list[wi];
+      ri = 0;
+      app.querySelector('#prog').style.width = (wi / list.length * 100) + '%';
+      const box = app.querySelector('#cardBox');
+      box.innerHTML = '<div class="card in" id="card">' + DIBC.cardHTML(c) +
+        '<div class="tools"><button class="btn btn-outline" id="model">🔊 איך אומרים?</button>' +
+        (canRec && cfg.rec ? '<button class="btn btn-outline rec" id="rec">🎤 הקלטה</button><button class="btn btn-outline" id="play" hidden>▶ לשמוע אותי</button>' : '') + '</div>' +
+        '<div class="dots">' + '<i></i>'.repeat(reps) + '</div>' +
+        (cfg.rate === 'adult'
+          ? '<div class="judge"><button class="btn btn-mint btn-lg" data-j="ok">✓ נכון</button><button class="btn btn-lg" style="background:var(--sun);color:#5A3A00" data-j="cue">≈ כמעט</button><button class="btn btn-outline btn-lg" data-j="no">✗ עוד לא</button></div>'
+          : '<button class="btn btn-coral btn-lg said" data-j="ok">אמרתי! 🗣️</button>') +
+        '</div>';
+      look(-6, 2);
+      setTimeout(() => DIB.speak(c.speak || c.text), 300);
+      box.querySelector('#model').onclick = () => DIB.speak(c.speak || c.text);
+      box.querySelectorAll('[data-j]').forEach(b => b.onclick = () => judge(b.dataset.j, b));
+      const rec = box.querySelector('#rec');
+      if (rec) {
+        let mr = null, url = null;
+        const play = box.querySelector('#play');
+        rec.onclick = async () => {
+          if (mr && mr.state === 'recording') { mr.stop(); return; }
+          try {
+            const s = await getStream();
+            const chunks = [];
+            mr = new MediaRecorder(s);
+            mr.ondataavailable = e => chunks.push(e.data);
+            mr.onstop = () => {
+              rec.classList.remove('on'); rec.textContent = '🎤 הקלטה';
+              if (url) URL.revokeObjectURL(url);
+              url = URL.createObjectURL(new Blob(chunks, { type: mr.mimeType }));
+              play.hidden = false; new Audio(url).play();
+            };
+            mr.start(); rec.classList.add('on'); rec.textContent = '⏹ עצירה';
+            setTimeout(() => { if (mr.state === 'recording') mr.stop(); }, 4000);
+          } catch (e) { DIB.toast('לא קיבלנו גישה למיקרופון', 'error'); rec.remove(); }
+        };
+        play.onclick = () => url && new Audio(url).play();
+      }
+    }
+
+    async function judge(j, btn) {
+      if (busy) return;
+      busy = true;
+      results[wi].push(j);
+      const dot = app.querySelectorAll('.dots i')[ri];
+      dot.classList.add(j);
+      ri++;
+      if (j === 'no') { DIB.sfx.bad(); say('עוד פעם?'); }
+      else { await feed(btn, FOOD[(wi + ri) % FOOD.length], j === 'ok' ? 'יאמי!' : 'ממממ'); }
+      app.querySelector('#sc').textContent = results.flat().filter(x => x !== 'no').length;
+      if (ri >= reps) {
+        await wait(300);
+        await eatCard();
+        wi++;
+        if (wi >= list.length) return finish(false);
+        showWord();
+      }
+      busy = false;
+    }
+
+    function feed(from, emoji, txt) {
+      return new Promise(res => {
+        const r = from.getBoundingClientRect(), m = mon.getBoundingClientRect();
+        const f = document.createElement('div');
+        f.className = 'food'; f.textContent = emoji;
+        f.style.left = (r.left + r.width / 2 - 20) + 'px'; f.style.top = (r.top - 10) + 'px';
+        document.body.appendChild(f);
+        mon.classList.add('open');
+        look(m.left + m.width / 2 > r.left ? -5 : 5, 4);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          f.style.left = (m.left + m.width / 2 - 20) + 'px'; f.style.top = (m.top + m.height * 0.55) + 'px'; f.style.transform = 'scale(.5)';
+        }));
+        setTimeout(() => {
+          f.remove(); mon.classList.remove('open'); mon.classList.remove('chomp'); void mon.getBBox(); mon.classList.add('chomp');
+          DIB.sfx.good(); say(txt);
+          const e = app.querySelector('#eaten'); e.insertAdjacentHTML('beforeend', '<span>' + emoji + '</span>');
+          res();
+        }, 600);
+      });
+    }
+
+    function eatCard() {
+      return new Promise(res => {
+        const card = app.querySelector('#card');
+        const r = card.getBoundingClientRect(), m = mon.getBoundingClientRect();
+        card.style.setProperty('--tx', (m.left + m.width / 2 - (r.left + r.width / 2)) + 'px');
+        mon.classList.add('open');
+        card.classList.add('eaten');
+        setTimeout(() => {
+          mon.classList.remove('open'); mon.classList.add('happy');
+          DIB.sfx.win(); say('איזה טעים!');
+          setTimeout(() => { mon.classList.remove('happy'); res(); }, 900);
+        }, 600);
+      });
+    }
+
+    function finish(early) {
+      stopStream();
+      document.body.classList.remove('playing');
+      const secs = Math.round((Date.now() - t0) / 1000);
+      const flat = results.flat();
+      const ok = flat.filter(x => x === 'ok').length, cue = flat.filter(x => x === 'cue').length;
+      const practiced = list.filter((c, i) => results[i].length);
+      const hard = list.filter((c, i) => results[i].some(x => x !== 'ok'));
+      if (flat.length) DIB.logSession({ game: GAME, label: 'היגוי · ' + DIBC.describe(cfg), patient: cfg.patient || '', total: flat.length, correct: ok, cued: cue, missed: hard.map(c => c.text), words: practiced.map(c => c.text), secs, early: !!early, rated: cfg.rate === 'adult' });
+      if (early && !flat.length) return setup.redraw();
+      const pct = flat.length ? ok / flat.length : 0;
+      const adult = cfg.rate === 'adult';
+      DIBC.endScreen(app, {
+        stars: adult ? (pct >= 0.8 ? 3 : pct >= 0.5 ? 2 : 1) : (early ? 2 : 3), trophy: '👾',
+        title: early ? 'יופי של תרגול!' : 'המפלצת שבעה ומאושרת!', sub: DIBC.describe(cfg), say: 'כל הכבוד! המפלצת שבעה!',
+        kpis: [[practiced.length, 'מילים'], [flat.length, 'חזרות']].concat(adult ? [[Math.round(pct * 100) + '%', 'נכון']] : []).concat([[secs >= 60 ? Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') : secs + '״', 'זמן']]),
+        words: adult ? null : practiced, wordsTitle: 'המילים שתרגלנו',
+        onAgain: () => start(cfg, all), onSettings: () => { setup.redraw(); }
+      });
+      if (adult) {
+        const tbl = '<table class="summary"><tbody>' + list.map((c, i) => results[i].length ? '<tr><td><b>' + DIBC.hlText(c.text, c.hl) + '</b></td><td><span class="r">' +
+          results[i].map(x => '<i style="background:' + (x === 'ok' ? 'var(--mint)' : x === 'cue' ? 'var(--sun)' : 'var(--coral)') + '"></i>').join('') + '</span></td></tr>' : '').join('') + '</tbody></table>';
+        app.querySelector('.endbtns').insertAdjacentHTML('beforebegin', tbl);
+      }
+    }
+    showWord();
+  }
+
+  function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+})();
+</script>
+</body>
+</html>
