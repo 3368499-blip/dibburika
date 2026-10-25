@@ -49,7 +49,7 @@
 
 ## העלאה לאוויר
 **GitHub Pages:** Settings ← Pages ← Deploy from a branch ← בוחרים את הענף ואת `/(root)`.
-הכתובת תהיה `https://3368499-blip.github.io/-/dibburika/`.
+הכתובת תהיה `https://3368499-blip.github.io/dibburika/`.
 אפשר לחבר דומיין משלכם באותו מסך (Custom domain), או להעלות את התיקייה כמו שהיא לכל אחסון.
 אין שלב בנייה: אלה קבצים רגילים.
 
