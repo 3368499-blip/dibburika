@@ -173,7 +173,7 @@
     function render() {
       if (!sources.includes(cfg.src)) cfg.src = sources[0];
       const n = cards(cfg).length;
-      let h = sources.length > 1 ? '<div class="src-row">' + sources.map(id => '<button class="src' + (cfg.src === id ? ' on' : '') + '" data-src="' + id + '"><span class="em">' + SOURCES[id].em + '</span><b>' + SOURCES[id].name + '</b><small>' + SOURCES[id].desc + '</small></button>').join('') + '</div>' : '';
+      let h = sources.length > 1 ? '<div class="src-row">' + sources.map(id => '<button class="src' + (cfg.src === id ? ' on' : '') + '" data-src="' + id + '"><span class="em">' + SOURCES[id].em + '</span><b>' + SOURCES[id].name + '</b></button>').join('') + '</div>' : '';
 
       if (cfg.src === 'words') {
         const cats = DIB.categories();
@@ -182,7 +182,7 @@
         DIB.words({ maxLevel: cfg.level || 3 }).forEach(w => counts[w.cat] = (counts[w.cat] || 0) + 1);
         h += '<div class="sub-label">נושאים</div><div class="cats">' +
           '<button class="cat all' + (!cfg.cats.length ? ' on' : '') + '" style="--c:var(--brand)" data-cat="">✨ הכל</button>' +
-          cats.map(c => '<button class="cat' + (cfg.cats.includes(c.id) ? ' on' : '') + '" style="--c:' + c.color + '" data-cat="' + c.id + '"><span class="em">' + c.emoji + '</span>' + esc(c.name) + ' <small>' + (counts[c.id] || 0) + '</small></button>').join('') + '</div>' +
+          cats.map(c => '<button class="cat' + (cfg.cats.includes(c.id) ? ' on' : '') + '" style="--c:' + c.color + '" data-cat="' + c.id + '"><span class="em">' + c.emoji + '</span>' + esc(c.name) + '</button>').join('') + '</div>' +
           seg('רמה', 'level', LEVELS, cfg.level || 3);
       }
       if (cfg.src === 'uses') h += seg('רמה', 'level', LEVELS, cfg.level || 3) + '<p class="muted small" style="margin-top:10px">כל כרטיס מציג חפץ ואת מה שעושים איתו, למשל: <b>מפתח · פותחים</b>.</p>';
@@ -246,6 +246,7 @@
     else { try { Object.assign(cfg, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) { /* ignore */ } }
     const persist = () => { if (!fromLink) { try { localStorage.setItem(KEY, JSON.stringify(cfg)); } catch (e) { /* ignore */ } } };
     let showAll = !fromLink;
+    let moreOpen = false;
 
     function draw() {
       const n = cards(cfg).length;
@@ -260,10 +261,11 @@
         app.querySelector('#more').onclick = () => { showAll = true; draw(); };
         return;
       }
-      app.innerHTML = '<div class="wrap">' + top + '<div class="setup"><h1>' + esc(opts.title) + '</h1><p class="sub">' + esc(opts.intro) + '</p>' +
-        '<div class="panel"><h2><span class="n">1</span>ממה משחקים?</h2><div id="picker"></div></div>' +
-        '<div class="panel"><h2><span class="n">2</span>הגדרות המשחק</h2><div class="opts">' + (opts.options ? opts.options(cfg) : '') +
-        '<label class="field" style="margin:0"><span>שם המטופל/ת (לא חובה, לתיעוד)</span><input class="input" id="patient" value="' + esc(cfg.patient || '') + '" placeholder="למשל: נועה"></label></div></div>' +
+      const back = '<div class="bar"><a class="btn btn-ghost btn-sm" href="../index.html">→ לכל המשחקים</a></div>';
+      app.innerHTML = '<div class="wrap">' + back + '<div class="setup"><h1><span class="h-em">' + opts.emoji + '</span>' + esc(opts.title) + '</h1><p class="sub">' + esc(opts.intro) + '</p>' +
+        '<div class="panel"><h2>ממה משחקים?</h2><div id="picker"></div></div>' +
+        '<details class="panel more"' + (moreOpen ? ' open' : '') + '><summary>הגדרות נוספות</summary><div class="opts">' + (opts.options ? opts.options(cfg) : '') +
+        '<label class="field" style="margin:0"><span>שם המטופל/ת (לתיעוד, לא חובה)</span><input class="input" id="patient" value="' + esc(cfg.patient || '') + '" placeholder="למשל: נועה"></label></div></details>' +
         '<div class="start-row"><button class="btn btn-outline" id="share">📤 שליחה להורה</button>' +
         '<button class="btn btn-coral btn-lg" id="start"' + (n < min ? ' disabled' : '') + '>' + (n < min ? 'צריך לפחות ' + min : 'מתחילים! ▶') + '</button></div></div></div>';
       picker(app.querySelector('#picker'), cfg, opts.sources, soft => {
@@ -278,6 +280,7 @@
       }));
       app.querySelectorAll('.opts input[data-t]').forEach(i => i.onchange = () => { cfg[i.dataset.t] = i.checked; persist(); });
       if (opts.bindOptions) opts.bindOptions(app, cfg, draw, persist);
+      app.querySelector('details.more').addEventListener('toggle', e => { moreOpen = e.target.open; });
       app.querySelector('#patient').oninput = e => { cfg.patient = e.target.value.trim(); persist(); };
       app.querySelector('#share').onclick = () => shareDialog(cfg, opts.title);
       app.querySelector('#start').onclick = () => opts.onStart(cfg, cards(cfg));
